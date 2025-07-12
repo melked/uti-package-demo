@@ -26,19 +26,31 @@ class Gray(Component):
     def bootstrap(config: dict) -> dict:
         return {}
 
+    def cartoonify(self, image):
+        color = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
 
-    def gray(self,img):
-        """
-        Convert image to grayscale.
-        """
-        return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray_blur = cv2.medianBlur(gray, 5)
+
+        edges = cv2.adaptiveThreshold(
+            gray_blur, 255,
+            cv2.ADAPTIVE_THRESH_MEAN_C,
+            cv2.THRESH_BINARY,
+            blockSize=9, C=9
+        )
+
+        cartoon = cv2.bitwise_and(color, color, mask=edges)
+        return cartoon
 
     def run(self):
         img = Image.get_frame(img=self.image, redis_db=self.redis_db)
-        img.value = self.gray(img.value)
+        img.value = self.cartoonify(img.value)
         self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
         packageModel = build_response(context=self)
         return packageModel
+
+
+
 
 if "__main__" == __name__:
     Executor(sys.argv[1]).run()
