@@ -28,7 +28,7 @@ class Gray(Component):
 
     import cv2
 
-    def cartoonify(image):
+    def cartoonify(image,image):
 
         if image.dtype != cv2.CV_8U and image.max() <= 1.0:
             image = (image * 255).astype('uint8')
