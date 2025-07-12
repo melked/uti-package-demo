@@ -27,18 +27,25 @@ class Gray(Component):
         return {}
 
     def cartoonify(self, image):
+        # 1. Renkli görüntüyü yumuşat (renk korunsun)
         color = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
 
+        # 2. Grayscale'e çevir
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # 3. Blurlama (opsiyonel ama güzel sonuç verir)
         gray_blur = cv2.medianBlur(gray, 5)
 
+        # 4. adaptiveThreshold (şu an hatanın olduğu yer)
         edges = cv2.adaptiveThreshold(
             gray_blur, 255,
             cv2.ADAPTIVE_THRESH_MEAN_C,
             cv2.THRESH_BINARY,
-            blockSize=9, C=9
+            blockSize=9,
+            C=9
         )
 
+        # 5. Kenarları renkli görüntüye uygula
         cartoon = cv2.bitwise_and(color, color, mask=edges)
         return cartoon
 
