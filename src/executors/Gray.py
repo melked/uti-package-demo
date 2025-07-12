@@ -34,6 +34,8 @@ class Gray(Component):
 
         gray_blur = cv2.medianBlur(gray, 5)
 
+        gray_blur = gray_blur.astype('uint8')
+
         edges = cv2.Canny(gray_blur, threshold1=50, threshold2=150)
 
         edges_inv = cv2.bitwise_not(edges)
@@ -41,9 +43,6 @@ class Gray(Component):
         edges_colored = cv2.cvtColor(edges_inv, cv2.COLOR_GRAY2BGR)
 
         cartoon = cv2.bitwise_and(color, edges_colored)
-        return cartoon
-
-        cartoon = cv2.bitwise_and(color, color, mask=edges)
         return cartoon
 
     def run(self):
