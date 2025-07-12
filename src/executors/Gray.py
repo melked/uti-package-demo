@@ -26,7 +26,12 @@ class Gray(Component):
     def bootstrap(config: dict) -> dict:
         return {}
 
-    def cartoonify(self, image):
+    import cv2
+
+    def cartoonify(image):
+
+        if image.dtype != cv2.CV_8U and image.max() <= 1.0:
+            image = (image * 255).astype('uint8')
 
         color = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
 
@@ -34,15 +39,19 @@ class Gray(Component):
 
         gray_blur = cv2.medianBlur(gray, 5)
 
-        gray_blur = gray_blur.astype('uint8')
+        edges = cv2.adaptiveThreshold(
+            gray_blur,
+            255,
+            cv2.ADAPTIVE_THRESH_MEAN_C,
+            cv2.THRESH_BINARY,
+            blockSize=9,
+            C=2
+        )
 
-        edges = cv2.Canny(gray_blur, threshold1=50, threshold2=150)
-
-        edges_inv = cv2.bitwise_not(edges)
-
-        edges_colored = cv2.cvtColor(edges_inv, cv2.COLOR_GRAY2BGR)
+        edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
 
         cartoon = cv2.bitwise_and(color, edges_colored)
+
         return cartoon
 
     def run(self):
