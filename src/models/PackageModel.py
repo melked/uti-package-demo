@@ -3,7 +3,6 @@ from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
 
-
 class InputImage(Input):
     name: Literal["inputImage"] = "inputImage"
     value: Union[List[Image], Image]
@@ -119,7 +118,6 @@ class Gray(Config):
             }
         }
 
-
 class InputImage1(Input):
     name: Literal["inputImage1"] = "inputImage1"
     value: Union[List[Image], Image]
@@ -174,7 +172,7 @@ class CompareInputs(Inputs):
 
 
 class CompareConfigs(Configs):
-    pass
+    drawBBox: KeepSideBBox
 
 
 class CompareOutputs(Outputs):
@@ -184,7 +182,7 @@ class CompareOutputs(Outputs):
 
 class CompareRequest(Request):
     inputs: Optional[CompareInputs]
-    configs: Optional[CompareConfigs]
+    configs: CompareConfigs
 
     class Config:
         json_schema_extra = {
@@ -210,7 +208,6 @@ class Compare(Config):
             }
         }
 
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -231,4 +228,4 @@ class PackageConfigs(Configs):
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
-    name: Literal["Gray"] = "Gray"  # İstersen "MultiExecutor" vs olarak değiştirilebilir
+    name: Literal["Gray"] = "Gray"
