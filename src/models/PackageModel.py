@@ -1,16 +1,19 @@
 from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
-from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
+from sdks.novavision.src.base.model import (
+    Package, Image, Inputs, Configs, Outputs, Response, Request,
+    Output, Input, Config
+)
 
 
-class InputImage(Input):
-    name: Literal["inputImage"] = "inputImage"
+class InputImageOne(Input):
+    name: Literal["inputImageOne"] = "inputImageOne"
     value: Union[List[Image], Image]
     type: str = "object"
 
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
-        value = values.get('value')
+        value = values.get("value")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
@@ -20,14 +23,14 @@ class InputImage(Input):
         title = "Image"
 
 
-class OutputImage(Output):
-    name: Literal["outputImage"] = "outputImage"
-    value: Union[List[Image],Image]
+class InputImageTwo(Input):
+    name: Literal["inputImageTwo"] = "inputImageTwo"
+    value: Union[List[Image], Image]
     type: str = "object"
 
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
-        value = values.get('value')
+        value = values.get("value")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
@@ -35,6 +38,34 @@ class OutputImage(Output):
 
     class Config:
         title = "Image"
+
+
+class OutputImageOne(Output):
+    name: Literal["outputImageOne"] = "outputImageOne"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type_based_on_value(cls, value, values):
+        value = values.get("value")
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+    class Config:
+        title = "Image"
+
+
+
+class Degree(Config):
+    name: Literal["Degree"] = "Degree"
+    value: int = Field(ge=-359.0, le=359.0, default=0)
+    type: Literal["number"] = "number"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Rotation Degree"
 
 
 class KeepSideFalse(Config):
@@ -57,9 +88,7 @@ class KeepSideTrue(Config):
         title = "Enable"
 
 
-
 class KeepSideBBox(Config):
-
     name: Literal["KeepSide"] = "KeepSide"
     value: Union[KeepSideTrue, KeepSideFalse]
     type: Literal["object"] = "object"
@@ -69,28 +98,34 @@ class KeepSideBBox(Config):
         title = "Keep Sides"
 
 
-
-class Degree(Config):
-    """
-        Burası parametrenin yorumudur, Config açıklaması olarak görünür.
-    """
-    name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359.0, le=359.0,default=0)
-    type: Literal["number"] = "number"
-    field: Literal["textInput"] = "textInput"
+class CompareModeSSIM(Config):
+    name: Literal["SSIM"] = "SSIM"
+    value: Literal["SSIM"] = "SSIM"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
 
     class Config:
-        title = "Angleeeee"
+        title = "SSIM"
+
+
+class CompareModeConfig(Config):
+    name: Literal["CompareMode"] = "CompareMode"
+    value: Union[CompareModeSSIM]
+    type: Literal["object"] = "object"
+    field: Literal["dropdownlist"] = "dropdownlist"
+
+    class Config:
+        title = "Comparison Method"
 
 
 
 class GrayInputs(Inputs):
-    inputImage: InputImage
+    inputImageOne: InputImageOne
 
 
 class GrayConfigs(Configs):
-    degree: Degree
-    drawBBox: KeepSideBBox
+    Degree: Degree
+    KeepSide: KeepSideBBox
 
 
 class GrayRequest(Request):
@@ -104,8 +139,7 @@ class GrayRequest(Request):
 
 
 class GrayOutputs(Outputs):
-    outputImage: OutputImage
-
+    outputImageOne: OutputImageOne
 
 
 class GrayResponse(Response):
@@ -119,26 +153,67 @@ class Gray(Config):
     field: Literal["option"] = "option"
 
     class Config:
-        title = "GrayExecutor"
+        title = "Gray"
         json_schema_extra = {
             "target": {
                 "value": 0
             }
         }
 
+
+
+class CompareInputs(Inputs):
+    inputImageOne: InputImageOne
+    inputImageTwo: InputImageTwo
+
+
+class CompareConfigs(Configs):
+    CompareMode: CompareModeConfig
+
+
+class CompareRequest(Request):
+    inputs: Optional[CompareInputs]
+    configs: CompareConfigs
+
+    class Config:
+        json_schema_extra = {
+            "target": "configs"
+        }
+
+
+class CompareOutputs(Outputs):
+    outputImageOne: OutputImageOne
+
+
+class CompareResponse(Response):
+    outputs: CompareOutputs
+
+
+class Compare(Config):
+    name: Literal["Compare"] = "Compare"
+    value: Union[CompareRequest, CompareResponse]
+    type: Literal["object"] = "object"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Compare"
+        json_schema_extra = {
+            "target": {
+                "value": 0
+            }
+        }
+
+
+
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[Gray]
+    value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
-        title = "Task"
+        title = "Type"
 
-
-        json_schema_extra = {
-            "target": "value"
-        }
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
@@ -147,4 +222,4 @@ class PackageConfigs(Configs):
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
-    name: Literal["Gray"] = "Gray"
+    name: Literal["GrayCompare"] = "GrayCompare"
