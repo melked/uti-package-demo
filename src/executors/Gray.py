@@ -5,6 +5,7 @@
 import os
 import cv2
 import sys
+import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
 from sdks.novavision.src.media.image import Image
@@ -29,8 +30,8 @@ class Gray(Component):
     import cv2
 
     def Gray(self, image):
-        import numpy as np
-        import cv2
+
+
 
         if image.dtype != np.uint8:
             if image.max() <= 1.0:
