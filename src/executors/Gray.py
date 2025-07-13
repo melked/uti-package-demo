@@ -28,16 +28,22 @@ class Gray(Component):
 
     import cv2
 
-    def cartoonify(self, image):
+    def Gray(self, image):
+        import numpy as np
+        import cv2
 
-        if image.dtype != cv2.CV_8U and image.max() <= 1.0:
-            image = (image * 255).astype('uint8')
+        if image.dtype != np.uint8:
+            if image.max() <= 1.0:
+                image = (image * 255).astype(np.uint8)
+            else:
+                image = image.astype(np.uint8)
 
         color = cv2.bilateralFilter(image, d=9, sigmaColor=75, sigmaSpace=75)
-
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
         gray_blur = cv2.medianBlur(gray, 5)
+
+        if gray_blur.dtype != np.uint8:
+            gray_blur = gray_blur.astype(np.uint8)
 
         edges = cv2.adaptiveThreshold(
             gray_blur,
@@ -49,7 +55,6 @@ class Gray(Component):
         )
 
         edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
-
         cartoon = cv2.bitwise_and(color, edges_colored)
 
         return cartoon
