@@ -1,7 +1,8 @@
 from pydantic import Field, validator, root_validator
 from typing import List, Optional, Union, Literal
-from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
-
+from sdks.novavision.src.base.model import (
+    Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
+)
 
 
 class InputImage(Input):
@@ -39,6 +40,8 @@ class OutputImage(Output):
     class Config:
         title = "Image"
 
+
+
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -48,7 +51,6 @@ class KeepSideFalse(Config):
     class Config:
         title = "Disable"
 
-
 class KeepSideTrue(Config):
     name: Literal["True"] = "True"
     value: Literal[True] = True
@@ -57,7 +59,6 @@ class KeepSideTrue(Config):
 
     class Config:
         title = "Enable"
-
 
 class KeepSideBBox(Config):
     name: Literal["KeepSide"] = "KeepSide"
@@ -82,24 +83,19 @@ class Degree(Config):
 class GrayInputs(Inputs):
     inputImage: InputImage
 
-
 class GrayConfigs(Configs):
     degree: Degree
     drawBBox: KeepSideBBox
-
 
 class GrayRequest(Request):
     inputs: Optional[GrayInputs]
     configs: GrayConfigs
 
-
 class GrayOutputs(Outputs):
     outputImage: OutputImage
 
-
 class GrayResponse(Response):
     outputs: GrayOutputs
-
 
 class Gray(Config):
     name: Literal["Gray"] = "Gray"
@@ -110,6 +106,9 @@ class Gray(Config):
     class Config:
         title = "GrayExecutor"
 
+# ------------------------------
+# Compare Executor Modelleri
+# ------------------------------
 
 class InputImage1(Input):
     name: Literal["inputImage1"] = "inputImage1"
@@ -125,7 +124,6 @@ class InputImage1(Input):
             return "list"
         return "object"
 
-
 class InputImage2(Input):
     name: Literal["inputImage2"] = "inputImage2"
     value: Union[List[Image], Image]
@@ -140,26 +138,21 @@ class InputImage2(Input):
             return "list"
         return "object"
 
-
 class CompareInputs(Inputs):
     inputImage1: InputImage1
     inputImage2: InputImage2
 
-
 class CompareConfigs(Configs):
     drawBBox: KeepSideBBox
-
 
 class CompareRequest(Request):
     inputs: Optional[CompareInputs]
     configs: CompareConfigs
 
-
 class SimilarityScore(Output):
     name: Literal["similarityScore"] = "similarityScore"
     value: float
     type: Literal["number"] = "number"
-
 
 class DiffImage(Output):
     name: Literal["diffImage"] = "diffImage"
@@ -175,15 +168,12 @@ class DiffImage(Output):
             return "list"
         return "object"
 
-
 class CompareOutputs(Outputs):
     similarityScore: SimilarityScore
     diffImage: DiffImage
 
-
 class CompareResponse(Response):
     outputs: CompareOutputs
-
 
 class Compare(Config):
     name: Literal["Compare"] = "Compare"
@@ -195,11 +185,10 @@ class Compare(Config):
         title = "CompareExecutor"
 
 
-
 class ExecutorSelector(Config):
     name: Literal["ExecutorSelector"] = "ExecutorSelector"
     selected_executor: Literal["Gray", "Compare"]
-    executor: Union[Gray, Compare]
+    executor: Union[Gray, Compare] = Field(..., discriminator="name")
 
     class Config:
         title = "Executor Selector"
@@ -208,16 +197,16 @@ class ExecutorSelector(Config):
     def check_executor_matches_selection(cls, values):
         sel = values.get("selected_executor")
         exe = values.get("executor")
-        if sel == "Gray" and not isinstance(exe, Gray):
+        if sel == "Gray" and exe.get("name") != "Gray":
             raise ValueError("selected_executor 'Gray' seçildi ama executor Gray değil")
-        if sel == "Compare" and not isinstance(exe, Compare):
+        if sel == "Compare" and exe.get("name") != "Compare":
             raise ValueError("selected_executor 'Compare' seçildi ama executor Compare değil")
         return values
 
 
+
 class PackageConfigs(Configs):
     executor_selector: ExecutorSelector
-
 
 class PackageModel(Package):
     configs: PackageConfigs
