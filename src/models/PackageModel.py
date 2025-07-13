@@ -218,7 +218,6 @@ class ConfigExecutor(Config):
 class PackageConfigs(Configs):
     executor: ConfigExecutor
 
-FirstImage
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
