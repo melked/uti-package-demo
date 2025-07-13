@@ -40,14 +40,15 @@ class OutputImage(Output):
     class Config:
         title = "Image"
 
-
+# ------------------------------
+# Gray Executor
+# ------------------------------
 
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
     type: Literal["bool"] = "bool"
     field: Literal["option"] = "option"
-
     class Config:
         title = "Disable"
 
@@ -56,7 +57,6 @@ class KeepSideTrue(Config):
     value: Literal[True] = True
     type: Literal["bool"] = "bool"
     field: Literal["option"] = "option"
-
     class Config:
         title = "Enable"
 
@@ -65,20 +65,16 @@ class KeepSideBBox(Config):
     value: Union[KeepSideTrue, KeepSideFalse]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
-
     class Config:
         title = "Keep Sides"
-
 
 class Degree(Config):
     name: Literal["Degree"] = "Degree"
     value: int = Field(ge=-359, le=359, default=0)
     type: Literal["number"] = "number"
     field: Literal["textInput"] = "textInput"
-
     class Config:
-        title = "Angleeeee"
-
+        title = "Angle"
 
 class GrayInputs(Inputs):
     inputImage: InputImage
@@ -102,19 +98,14 @@ class Gray(Config):
     value: Union[GrayRequest, GrayResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
-
     class Config:
         title = "GrayExecutor"
 
-# ------------------------------
-# Compare Executor Modelleri
-# ------------------------------
 
 class InputImage1(Input):
     name: Literal["inputImage1"] = "inputImage1"
     value: Union[List[Image], Image]
     type: str = "object"
-
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, v, values):
         value = values.get('value')
@@ -128,7 +119,6 @@ class InputImage2(Input):
     name: Literal["inputImage2"] = "inputImage2"
     value: Union[List[Image], Image]
     type: str = "object"
-
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, v, values):
         value = values.get('value')
@@ -158,7 +148,6 @@ class DiffImage(Output):
     name: Literal["diffImage"] = "diffImage"
     value: Union[List[Image], Image]
     type: str = "object"
-
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, v, values):
         value = values.get('value')
@@ -180,9 +169,9 @@ class Compare(Config):
     value: Union[CompareRequest, CompareResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
-
     class Config:
         title = "CompareExecutor"
+
 
 
 class ExecutorSelector(Config):
@@ -202,7 +191,6 @@ class ExecutorSelector(Config):
         if sel == "Compare" and exe.get("name") != "Compare":
             raise ValueError("selected_executor 'Compare' seçildi ama executor Compare değil")
         return values
-
 
 
 class PackageConfigs(Configs):
