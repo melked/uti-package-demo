@@ -6,8 +6,8 @@ from sdks.novavision.src.base.model import (
 )
 
 
-class InputImageOne(Input):
-    name: Literal["inputImageOne"] = "inputImageOne"
+class InputFirstImage(Input):
+    name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
@@ -23,8 +23,8 @@ class InputImageOne(Input):
         title = "Image"
 
 
-class InputImageTwo(Input):
-    name: Literal["inputImageTwo"] = "inputImageTwo"
+class InputSecondImage(Input):
+    name: Literal["inputSecondImage"] = "inputSecondImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
@@ -40,8 +40,8 @@ class InputImageTwo(Input):
         title = "Image"
 
 
-class OutputImageOne(Output):
-    name: Literal["outputImageOne"] = "outputImageOne"
+class OutputFirstImage(Output):
+    name: Literal["outputFirstImage"] = "outputFirstImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
