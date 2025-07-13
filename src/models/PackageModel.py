@@ -120,7 +120,7 @@ class CompareModeConfig(Config):
 
 
 class GrayInputs(Inputs):
-    inputImageOne: InputImageOne
+    inputFirstImage: InputFirstImage
 
 
 class GrayConfigs(Configs):
@@ -139,7 +139,7 @@ class GrayRequest(Request):
 
 
 class GrayOutputs(Outputs):
-    outputImageOne: OutputImageOne
+    outputFirstImage: OutputFirstImage
 
 
 class GrayResponse(Response):
@@ -163,8 +163,8 @@ class Gray(Config):
 
 
 class CompareInputs(Inputs):
-    inputImageOne: InputImageOne
-    inputImageTwo: InputImageTwo
+    inputFirstImage: InputFirstImage
+    inputSecondImage: InputSecondImage
 
 
 class CompareConfigs(Configs):
@@ -182,7 +182,7 @@ class CompareRequest(Request):
 
 
 class CompareOutputs(Outputs):
-    outputImageOne: OutputImageOne
+    outputFirstImage: OutputFirstImage
 
 
 class CompareResponse(Response):
@@ -218,7 +218,7 @@ class ConfigExecutor(Config):
 class PackageConfigs(Configs):
     executor: ConfigExecutor
 
-
+FirstImage
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
