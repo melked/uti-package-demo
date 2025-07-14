@@ -3,6 +3,7 @@ from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
 
+
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -39,7 +40,6 @@ class OutputFirstImage(Output):
         title = "Image"
 
 
-# --- Keep Side Config ---
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -122,7 +122,6 @@ class Gray(Config):
         }
 
 
-# --- Compare Executor Konfigürasyonları ---
 class InputSecondImage(Input):
     name: Literal["inputSecondImage"] = "inputSecondImage"
     value: Union[List[Image], Image]
@@ -215,7 +214,6 @@ class ConfigExecutor(Config):
         json_schema_extra = {
             "target": "value"
         }
-
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
