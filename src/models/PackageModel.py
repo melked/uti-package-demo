@@ -144,20 +144,13 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
-class GrayOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-
+class GrayInputs(Inputs):
+    inputFirstImage: InputFirstImage
 
 
 class GrayConfigs(Configs):
     Degree: Degree
     KeepSide: KeepSideBBox
-
-
-
-
-class GrayInputs(Inputs):
-    inputFirstImage: InputFirstImage
 
 
 class GrayRequest(Request):
@@ -169,8 +162,14 @@ class GrayRequest(Request):
             "target": "configs"
         }
 
+
+class GrayOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+
+
 class GrayResponse(Response):
     outputs: GrayOutputs
+
 
 class Gray(Config):
     name: Literal["Gray"] = "Gray"
@@ -186,20 +185,14 @@ class Gray(Config):
             }
         }
 
-class CompareConfigs(Configs):
-    CompareMode: CompareModeConfig
-
 
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
 
 
-class CompareOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-    similarityScore: SimilarityScore
-    diffImage: DiffImage
-
+class CompareConfigs(Configs):
+    CompareMode: CompareModeConfig
 
 
 class CompareRequest(Request):
@@ -212,6 +205,10 @@ class CompareRequest(Request):
         }
 
 
+class CompareOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+    similarityScore: SimilarityScore
+    diffImage: DiffImage
 
 
 class CompareResponse(Response):
@@ -232,7 +229,6 @@ class Compare(Config):
             }
         }
 
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -244,7 +240,6 @@ class ConfigExecutor(Config):
         json_schema_extra = {
             "target": "value"
         }
-
 
 
 class PackageConfigs(Configs):

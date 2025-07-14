@@ -1,3 +1,4 @@
+
 """
     It is a component that compares two images and returns a similarity score and a difference image.
 """
