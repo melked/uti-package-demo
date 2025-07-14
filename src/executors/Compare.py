@@ -19,9 +19,9 @@ class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
-        # İki girdi alıyoruz
-        self.image1 = self.request.get_param("inputImage1")
-        self.image2 = self.request.get_param("inputImage2")
+
+        self.image1 = self.request.get_param("inputFirstImage")
+        self.image2 = self.request.get_param("inputSecondImage")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
