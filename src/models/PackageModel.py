@@ -179,7 +179,7 @@ class CompareRequest(Request):
 
 class CompareOutputs(Outputs):
     outputFirstImage: OutputFirstImage
-    outputSecondImage: OutputFirstImage
+    outputSecondImage: OutputSecondImage
 
 
 class CompareResponse(Response):
