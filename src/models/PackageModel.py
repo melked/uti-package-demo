@@ -58,6 +58,8 @@ class OutputFirstImage(Output):
 
 
 
+
+
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -114,7 +116,6 @@ class GrayInputs(Inputs):
 
 
 class GrayConfigs(Configs):
-    Degree: Degree
     KeepSide: KeepSideBBox
 
 

@@ -60,12 +60,11 @@ class Compare(Component):
 
         diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
 
-        # Sadece JSON için context üzerinden return edilecek veriler
         self.context["similarityScore"] = similarity
 
         packageModel = build_response(
             context=self,
-            image=diff_img  # bu diff görseli doğrudan output olarak döner
+            image=diff_img
         )
 
         return packageModel
