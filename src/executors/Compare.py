@@ -23,6 +23,9 @@ class Compare(Component):
         self.image1 = self.request.get_param("inputFirstImage")
         self.image2 = self.request.get_param("inputSecondImage")
 
+        # context nesnesi yoksa kendimiz oluşturuyoruz
+        self.context = {}
+
     @staticmethod
     def bootstrap(config: dict) -> dict:
         return {}
@@ -49,6 +52,7 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
+        # Redis'ten image objelerini al
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -57,6 +61,7 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
+        # Image objelerini kopyala ve diff ile ikinci resmi ayarla
         diff_image_obj = deepcopy(img1)
         diff_image_obj.value = diff_image
         diff_img = Image.set_frame(img=diff_image_obj, package_uID=self.uID, redis_db=self.redis_db)
@@ -64,12 +69,13 @@ class Compare(Component):
         second_image_obj = deepcopy(img2)
         image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-        context = {}
-        context["similarityScore"] = similarity
-        context["image"] = diff_img  # Eğer build_response içindeki Gray için gerekliyse
+        # context artık dict değil, executor objesi gibi davranacak şekilde self veriyoruz
+        self.context["similarityScore"] = similarity
+        self.context["image"] = diff_img  # build_response'da Gray için gerekebilir
 
+        # build_response'ı executor objesi (self) ile çağırıyoruz
         package_model = build_response(
-            context=context,
+            context=self,
             diff_image=diff_img,
             second_image=image2_output,
             is_compare=True
