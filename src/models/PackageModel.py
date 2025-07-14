@@ -1,6 +1,9 @@
 from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
-from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
+from sdks.novavision.src.base.model import (
+    Package, Image, Inputs, Configs, Outputs, Response, Request,
+    Output, Input, Config
+)
 
 
 class InputFirstImage(Input):
@@ -15,10 +18,9 @@ class InputFirstImage(Input):
             return "object"
         elif isinstance(value, list):
             return "list"
-        return value
 
     class Config:
-        title = "First Image"
+        title = "Image"
 
 
 class InputSecondImage(Input):
@@ -33,10 +35,9 @@ class InputSecondImage(Input):
             return "object"
         elif isinstance(value, list):
             return "list"
-        return value
 
     class Config:
-        title = "Second Image"
+        title = "Image"
 
 
 class OutputFirstImage(Output):
@@ -51,37 +52,10 @@ class OutputFirstImage(Output):
             return "object"
         elif isinstance(value, list):
             return "list"
-        return value
 
     class Config:
-        title = "Output Image"
+        title = "Image"
 
-
-class SimilarityScore(Output):
-    name: Literal["similarityScore"] = "similarityScore"
-    value: float
-    type: Literal["number"] = "number"
-
-    class Config:
-        title = "Similarity Score"
-
-
-class DiffImage(Output):
-    name: Literal["diffImage"] = "diffImage"
-    value: Union[List[Image], Image]
-    type: str = "object"
-
-    @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
-        if isinstance(value, Image):
-            return "object"
-        elif isinstance(value, list):
-            return "list"
-        return value
-
-    class Config:
-        title = "Difference Image"
 
 
 class Degree(Config):
@@ -144,6 +118,7 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
+
 class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
 
@@ -186,6 +161,7 @@ class Gray(Config):
         }
 
 
+
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
@@ -207,8 +183,6 @@ class CompareRequest(Request):
 
 class CompareOutputs(Outputs):
     outputFirstImage: OutputFirstImage
-    similarityScore: SimilarityScore
-    diffImage: DiffImage
 
 
 class CompareResponse(Response):
@@ -229,6 +203,8 @@ class Compare(Config):
             }
         }
 
+
+
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -236,15 +212,11 @@ class ConfigExecutor(Config):
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
-        title = "Executor Type"
-        json_schema_extra = {
-            "target": "value"
-        }
+        title = "Type"
 
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
-
 
 class PackageModel(Package):
     configs: PackageConfigs
