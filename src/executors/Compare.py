@@ -3,8 +3,6 @@ import cv2
 import sys
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
-from pydantic import Field, validator
-from typing import List, Union, Literal
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
@@ -14,42 +12,37 @@ from sdks.novavision.src.helper.executor import Executor
 from components.GrayCompare.src.utils.response import build_response
 from components.GrayCompare.src.models.PackageModel import PackageModel
 
-
 class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
-        self.request.model = PackageModel(**(self.request.data))
 
+
+        self.request.model = PackageModel(**self.request.data)
+
+        self.compare_mode = self.request.get_param("CompareMode")
         self.image1 = self.request.get_param("inputFirstImage")
         self.image2 = self.request.get_param("inputSecondImage")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
-        return {
-            "dependentDropdown": {
-                "options": [
-                    {"label": "Option 1", "value": "option1", "field_type": "image"},
-                    {"label": "Option 2", "value": "option2", "field_type": "text"}
-                ]
-            }
-        }
+        return {}
 
-    def ensure_uint8(self, image):
-        """Ensure that the image is in uint8 format."""
+    def ensure_uint8(self, image: np.ndarray) -> np.ndarray:
+        """Resmi 0-255 aralığına normalize eder ve uint8'e çevirir."""
         if image.dtype != np.uint8:
             if image.max() <= 1.0:
-                return (image * 255).astype(np.uint8)
+                image = (image * 255).astype(np.uint8)
             else:
-                return image.astype(np.uint8)
+                image = image.astype(np.uint8)
         return image
 
-    def compare_images(self, img1, img2):
-        """Compare two images using SSIM."""
-        img1 = cv2.resize(img1, (256, 256))
-        img2 = cv2.resize(img2, (256, 256))
+    def compare_images(self, img1: np.ndarray, img2: np.ndarray) -> tuple[float, np.ndarray]:
+        """SSIM kullanarak iki resmi karşılaştırır ve fark görüntüsü oluşturur."""
+        img1_resized = cv2.resize(img1, (256, 256))
+        img2_resized = cv2.resize(img2, (256, 256))
 
-        gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-        gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+        gray1 = cv2.cvtColor(img1_resized, cv2.COLOR_BGR2GRAY)
+        gray2 = cv2.cvtColor(img2_resized, cv2.COLOR_BGR2GRAY)
 
         score, diff = ssim(gray1, gray2, full=True)
         diff = (diff * 255).astype(np.uint8)
@@ -58,8 +51,7 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
-        """Run the image comparison process."""
-        # Get images from the redis database
+
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -68,20 +60,21 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
-
         diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
+
+        image2_output = Image.set_frame(img=img2, package_uID=self.uID, redis_db=self.redis_db)
 
 
         self.context["similarityScore"] = similarity
 
-        packageModel = build_response(
+        package_model = build_response(
             context=self,
-            image=diff_img,
-            similarity_score=similarity
+            diff_image=diff_img,
+            second_image=image2_output,
+            is_compare=True
         )
 
-        return packageModel
-
+        return package_model
 
 if __name__ == "__main__":
     Executor(sys.argv[1]).run()

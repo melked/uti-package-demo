@@ -5,13 +5,14 @@ from sdks.novavision.src.base.model import (
     Output, Input, Config
 )
 
+
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
     @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
+    def set_type(cls, value, values):
         value = values.get("value")
         if isinstance(value, Image):
             return "object"
@@ -19,7 +20,7 @@ class InputFirstImage(Input):
             return "list"
 
     class Config:
-        title = "Image"
+        title = "First Image"
 
 
 class InputSecondImage(Input):
@@ -28,7 +29,7 @@ class InputSecondImage(Input):
     type: str = "object"
 
     @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
+    def set_type(cls, value, values):
         value = values.get("value")
         if isinstance(value, Image):
             return "object"
@@ -36,7 +37,8 @@ class InputSecondImage(Input):
             return "list"
 
     class Config:
-        title = "Image"
+        title = "Second Image"
+
 
 
 class OutputFirstImage(Output):
@@ -45,7 +47,7 @@ class OutputFirstImage(Output):
     type: str = "object"
 
     @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
+    def set_type(cls, value, values):
         value = values.get("value")
         if isinstance(value, Image):
             return "object"
@@ -53,7 +55,7 @@ class OutputFirstImage(Output):
             return "list"
 
     class Config:
-        title = "Image"
+        title = "Gray Output"
 
 
 class OutputSecondImage(Output):
@@ -62,7 +64,7 @@ class OutputSecondImage(Output):
     type: str = "object"
 
     @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
+    def set_type(cls, value, values):
         value = values.get("value")
         if isinstance(value, Image):
             return "object"
@@ -70,12 +72,30 @@ class OutputSecondImage(Output):
             return "list"
 
     class Config:
-        title = "Image"
+        title = "Second Output"
+
+
+class OutputDiffImage(Output):
+    name: Literal["outputDiffImage"] = "outputDiffImage"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type(cls, value, values):
+        value = values.get("value")
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+    class Config:
+        title = "Diff Image"
+
 
 
 class Degree(Config):
     name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359.0, le=359.0, default=0)
+    value: int = Field(ge=-359, le=359, default=0)
     type: Literal["number"] = "number"
     field: Literal["textInput"] = "textInput"
 
@@ -103,7 +123,7 @@ class KeepSideTrue(Config):
         title = "Enable"
 
 
-class KeepSideBBox(Config):
+class KeepSide(Config):
     name: Literal["KeepSide"] = "KeepSide"
     value: Union[KeepSideTrue, KeepSideFalse]
     type: Literal["object"] = "object"
@@ -118,9 +138,13 @@ class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
 
 
+class GrayOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+
+
 class GrayConfigs(Configs):
     Degree: Degree
-    KeepSide: KeepSideBBox
+    KeepSide: KeepSide
 
 
 class GrayRequest(Request):
@@ -128,13 +152,7 @@ class GrayRequest(Request):
     configs: GrayConfigs
 
     class Config:
-        json_schema_extra = {
-            "target": "configs"
-        }
-
-
-class GrayOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
+        json_schema_extra = {"target": "configs"}
 
 
 class GrayResponse(Response):
@@ -149,11 +167,8 @@ class Gray(Config):
 
     class Config:
         title = "Gray"
-        json_schema_extra = {
-            "target": {
-                "value": 0
-            }
-        }
+        json_schema_extra = {"target": {"value": 0}}
+
 
 
 class CompareModeSSIM(Config):
@@ -166,7 +181,7 @@ class CompareModeSSIM(Config):
         title = "SSIM"
 
 
-class CompareModeConfig(Config):
+class CompareMode(Config):
     name: Literal["CompareMode"] = "CompareMode"
     value: Union[CompareModeSSIM]
     type: Literal["object"] = "object"
@@ -176,13 +191,19 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
+
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
 
 
+class CompareOutputs(Outputs):
+    outputDiffImage: OutputDiffImage
+    outputSecondImage: OutputSecondImage
+
+
 class CompareConfigs(Configs):
-    CompareMode: CompareModeConfig
+    CompareMode: CompareMode
 
 
 class CompareRequest(Request):
@@ -190,14 +211,7 @@ class CompareRequest(Request):
     configs: CompareConfigs
 
     class Config:
-        json_schema_extra = {
-            "target": "configs"
-        }
-
-
-class CompareOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-    outputSecondImage: OutputSecondImage
+        json_schema_extra = {"target": "configs"}
 
 
 class CompareResponse(Response):
@@ -212,16 +226,19 @@ class Compare(Config):
 
     class Config:
         title = "Compare"
-        json_schema_extra = {
-            "target": {
-                "value": 0
-            }
-        }
+        json_schema_extra = {"target": {"value": 0}}
+
+
+
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
+
+    class Config:
+        title = "Gray or Compare Executor"
+
 
 
 class PackageConfigs(Configs):
