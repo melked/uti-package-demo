@@ -202,7 +202,7 @@ class Compare(Config):
 
 
 class ConfigExecutor(Config):
-    name: Literal["ConfigExecutor"] = "ConfigExecutor"
+    name: Literal["ConfigExecutor"] = "ConfigExecutorrrr"
     value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
