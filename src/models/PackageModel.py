@@ -207,8 +207,6 @@ class ConfigExecutor(Config):
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
-    class Config:
-        title = "Type"
 
 
 class PackageConfigs(Configs):
