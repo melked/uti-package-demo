@@ -227,7 +227,31 @@ class Compare(Config):
                 "value": 0
             }
         }
+class PackageInputs(Inputs):
+    inputImage: InputImage
 
+
+class PackageConfigs(Configs):
+    degree: Degree
+    drawBBox: KeepSideBBox
+
+
+class PackageOutputs(Outputs):
+    outputImage: OutputImage
+
+
+class PackageRequest(Request):
+    inputs: Optional[PackageInputs]
+    configs: PackageConfigs
+
+    class Config:
+        json_schema_extra = {
+            "target": "configs"
+        }
+
+
+class PackageResponse(Response):
+    outputs: PackageOutputs
 
 class PackageExecutor(Config):
     name: Literal["Package"] = "Package"
