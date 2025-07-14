@@ -2,7 +2,7 @@ from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
-# -- Input ve Output Sınıfları --
+
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -237,6 +237,11 @@ class ConfigExecutor(Config):
 
     class Config:
         title = "Executor Type"
+        json_schema_extra = {
+            "target": "value"
+        }
+
+
 class PackageConfigs(Configs):
     executor: ConfigExecutor
 
