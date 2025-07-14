@@ -84,7 +84,6 @@ class DiffImage(Output):
         title = "Difference Image"
 
 
-# Konfigürasyon sınıfları
 class Degree(Config):
     name: Literal["Degree"] = "Degree"
     value: int = Field(ge=-359.0, le=359.0, default=0)
@@ -145,14 +144,20 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
-# Gray ve Compare için Input/Output yapılarını oluşturma
-class GrayInputs(Inputs):
-    inputFirstImage: InputFirstImage
+class GrayOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+
 
 
 class GrayConfigs(Configs):
     Degree: Degree
     KeepSide: KeepSideBBox
+
+
+
+
+class GrayInputs(Inputs):
+    inputFirstImage: InputFirstImage
 
 
 class GrayRequest(Request):
@@ -164,14 +169,8 @@ class GrayRequest(Request):
             "target": "configs"
         }
 
-
-class GrayOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-
-
 class GrayResponse(Response):
     outputs: GrayOutputs
-
 
 class Gray(Config):
     name: Literal["Gray"] = "Gray"
@@ -187,14 +186,20 @@ class Gray(Config):
             }
         }
 
+class CompareConfigs(Configs):
+    CompareMode: CompareModeConfig
+
 
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
 
 
-class CompareConfigs(Configs):
-    CompareMode: CompareModeConfig
+class CompareOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+    similarityScore: SimilarityScore
+    diffImage: DiffImage
+
 
 
 class CompareRequest(Request):
@@ -207,10 +212,6 @@ class CompareRequest(Request):
         }
 
 
-class CompareOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-    similarityScore: SimilarityScore
-    diffImage: DiffImage
 
 
 class CompareResponse(Response):
@@ -234,7 +235,7 @@ class Compare(Config):
 
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[Gray, Compare]  # Gray veya Compare seçilecek
+    value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
