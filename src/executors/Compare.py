@@ -1,29 +1,32 @@
 import os
-import cv2
 import sys
+import cv2
 import numpy as np
 from copy import deepcopy
 from skimage.metrics import structural_similarity as ssim
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../"))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
-from components.GrayCompare.src.utils.response import build_response
+
 from components.GrayCompare.src.models.PackageModel import PackageModel
+from components.GrayCompare.src.utils.response import build_response
+
 
 class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
-
         self.request.model = PackageModel(**self.request.data)
 
         self.compare_mode = self.request.get_param("CompareMode")
         self.image1 = self.request.get_param("inputFirstImage")
         self.image2 = self.request.get_param("inputSecondImage")
 
-        # context nesnesi yoksa kendimiz oluşturuyoruz
+
         self.context = {}
 
     @staticmethod
@@ -33,9 +36,9 @@ class Compare(Component):
     def ensure_uint8(self, image: np.ndarray) -> np.ndarray:
         if image.dtype != np.uint8:
             if image.max() <= 1.0:
-                image = (image * 255).astype(np.uint8)
+                return (image * 255).astype(np.uint8)
             else:
-                image = image.astype(np.uint8)
+                return image.astype(np.uint8)
         return image
 
     def compare_images(self, img1: np.ndarray, img2: np.ndarray) -> tuple[float, np.ndarray]:
@@ -52,7 +55,7 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
-        # Redis'ten image objelerini al
+
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -61,19 +64,19 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
-        # Image objelerini kopyala ve diff ile ikinci resmi ayarla
+
         diff_image_obj = deepcopy(img1)
         diff_image_obj.value = diff_image
         diff_img = Image.set_frame(img=diff_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
+
         second_image_obj = deepcopy(img2)
         image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-        # context artık dict değil, executor objesi gibi davranacak şekilde self veriyoruz
-        self.context["similarityScore"] = similarity
-        self.context["image"] = diff_img  # build_response'da Gray için gerekebilir
 
-        # build_response'ı executor objesi (self) ile çağırıyoruz
+        self.context["similarityScore"] = similarity
+        self.context["image"] = diff_img
+
         package_model = build_response(
             context=self,
             diff_image=diff_img,
