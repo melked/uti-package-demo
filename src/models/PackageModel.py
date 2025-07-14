@@ -58,16 +58,6 @@ class OutputFirstImage(Output):
 
 
 
-class Degree(Config):
-    name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359.0, le=359.0, default=0)
-    type: Literal["number"] = "number"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Rotation Degree"
-
-
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
