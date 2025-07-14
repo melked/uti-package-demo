@@ -5,7 +5,6 @@ from sdks.novavision.src.base.model import (
     Output, Input, Config
 )
 
-
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -55,7 +54,6 @@ class OutputFirstImage(Output):
 
     class Config:
         title = "Image"
-
 
 
 class Degree(Config):
@@ -118,7 +116,6 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
-
 class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
 
@@ -159,7 +156,6 @@ class Gray(Config):
                 "value": 0
             }
         }
-
 
 
 class CompareInputs(Inputs):
