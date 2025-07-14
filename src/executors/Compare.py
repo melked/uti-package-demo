@@ -57,19 +57,19 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
-        # Burada deepcopy ile var olan Image objesini klonla, value olarak diff görüntüyü ver
         diff_image_obj = deepcopy(img1)
         diff_image_obj.value = diff_image
         diff_img = Image.set_frame(img=diff_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-        # İkinci görüntüyü de aynı şekilde kopyala (değişmeden)
         second_image_obj = deepcopy(img2)
         image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-        self.context["similarityScore"] = similarity
+        context = {}
+        context["similarityScore"] = similarity
+        context["image"] = diff_img  # Eğer build_response içindeki Gray için gerekliyse
 
         package_model = build_response(
-            context=self,
+            context=context,
             diff_image=diff_img,
             second_image=image2_output,
             is_compare=True
