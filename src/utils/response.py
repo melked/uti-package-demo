@@ -1,6 +1,6 @@
 from copy import deepcopy
 from components.GrayCompare.src.models.PackageModel import (
-    Compare, CompareOutputs, CompareResponse, DiffImage,
+    Compare, CompareOutputs, CompareResponse, OutputDiffImage,
     Gray, GrayOutputs, GrayResponse,
     ConfigExecutor, PackageConfigs, PackageModel
 )
@@ -16,7 +16,7 @@ def build_response(context, diff_image=None, second_image=None, is_compare=False
 
     if is_compare:
 
-        diff_img_output = DiffImage(value=diff_image)
+        diff_img_output = OutputDiffImage(value=diff_image)
         compare_outputs = CompareOutputs(
             outputFirstImage=diff_img_output,
             outputSecondImage=second_image
