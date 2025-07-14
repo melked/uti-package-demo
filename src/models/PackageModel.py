@@ -1,11 +1,10 @@
-from pydantic import Field, validator
+from pydantic import Field, validator, root_validator
 from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import (
-    Package, Image, Inputs, Configs, Outputs, Response, Request,
-    Output, Input, Config
+    Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 )
 
-
+# --- Input ve Output Modelleri ---
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -14,10 +13,13 @@ class InputFirstImage(Input):
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
         value = values.get("value")
+        if value is None:
+            raise ValueError("inputFirstImage value cannot be None!")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
     class Config:
         title = "Image"
@@ -31,10 +33,13 @@ class InputSecondImage(Input):
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
         value = values.get("value")
+        if value is None:
+            raise ValueError("inputSecondImage value cannot be None!")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
     class Config:
         title = "Image"
@@ -47,19 +52,20 @@ class OutputFirstImage(Output):
 
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
+        value = values.get('value')
+        if value is None:
+            raise ValueError("outputFirstImage value cannot be None!")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
     class Config:
         title = "Image"
 
 
-
-
-
+# --- KeepSide ve Compare Mode Modelleri ---
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -110,9 +116,10 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
-
+# --- Gray Request ve Response Modelleri ---
 class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
+    inputSecondImage: InputSecondImage
 
 
 class GrayConfigs(Configs):
@@ -120,13 +127,20 @@ class GrayConfigs(Configs):
 
 
 class GrayRequest(Request):
-    inputs: Optional[GrayInputs]
+    inputs: Optional[GrayInputs] = None
     configs: GrayConfigs
 
     class Config:
         json_schema_extra = {
             "target": "configs"
         }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.inputs is None:
+            self.inputs = GrayInputs(inputFirstImage=None, inputSecondImage=None)
+        if self.configs is None:
+            self.configs = GrayConfigs(KeepSide=None)
 
 
 class GrayOutputs(Outputs):
@@ -152,7 +166,7 @@ class Gray(Config):
         }
 
 
-
+# --- Compare Request ve Response Modelleri ---
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
@@ -163,13 +177,20 @@ class CompareConfigs(Configs):
 
 
 class CompareRequest(Request):
-    inputs: Optional[CompareInputs]
+    inputs: Optional[CompareInputs] = None
     configs: CompareConfigs
 
     class Config:
         json_schema_extra = {
             "target": "configs"
         }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.inputs is None:
+            self.inputs = CompareInputs(inputFirstImage=None, inputSecondImage=None)
+        if self.configs is None:
+            self.configs = CompareConfigs(CompareMode=None)
 
 
 class CompareOutputs(Outputs):
@@ -195,7 +216,7 @@ class Compare(Config):
         }
 
 
-
+# --- ConfigExecutor ve Package Modelleri ---
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -208,6 +229,7 @@ class ConfigExecutor(Config):
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
+
 
 class PackageModel(Package):
     configs: PackageConfigs
