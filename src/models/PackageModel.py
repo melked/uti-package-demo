@@ -1,5 +1,5 @@
 from pydantic import Field, validator
-from typing import List, Optional, Union, Literal
+from typing import List, Union, Literal
 from sdks.novavision.src.base.model import (
     Package, Image, Inputs, Configs, Outputs, Response, Request,
     Output, Input, Config
@@ -72,6 +72,7 @@ class OutputSecondImage(Output):
     class Config:
         title = "Image"
 
+
 class Degree(Config):
     name: Literal["Degree"] = "Degree"
     value: int = Field(ge=-359.0, le=359.0, default=0)
@@ -111,25 +112,6 @@ class KeepSideBBox(Config):
     class Config:
         title = "Keep Sides"
 
-
-class CompareModeSSIM(Config):
-    name: Literal["SSIM"] = "SSIM"
-    value: Literal["SSIM"] = "SSIM"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "SSIM"
-
-
-class CompareModeConfig(Config):
-    name: Literal["CompareMode"] = "CompareMode"
-    value: Union[CompareModeSSIM]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-
-    class Config:
-        title = "Comparison Method"
 
 
 class GrayInputs(Inputs):
@@ -174,6 +156,26 @@ class Gray(Config):
         }
 
 
+class CompareModeSSIM(Config):
+    name: Literal["SSIM"] = "SSIM"
+    value: Literal["SSIM"] = "SSIM"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "SSIM"
+
+
+class CompareModeConfig(Config):
+    name: Literal["CompareMode"] = "CompareMode"
+    value: Union[CompareModeSSIM]
+    type: Literal["object"] = "object"
+    field: Literal["dropdownlist"] = "dropdownlist"
+
+    class Config:
+        title = "Comparison Method"
+
+
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
@@ -215,14 +217,11 @@ class Compare(Config):
                 "value": 0
             }
         }
-
-
 class ConfigExecutor(Config):
-    name: Literal["ConfigExecutor"] = "ConfigExecutorrrr"
+    name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
-
 
 
 class PackageConfigs(Configs):

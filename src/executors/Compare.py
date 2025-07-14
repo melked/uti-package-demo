@@ -35,6 +35,7 @@ class Compare(Component):
         }
 
     def ensure_uint8(self, image):
+        """Ensure that the image is in uint8 format."""
         if image.dtype != np.uint8:
             if image.max() <= 1.0:
                 return (image * 255).astype(np.uint8)
@@ -43,6 +44,7 @@ class Compare(Component):
         return image
 
     def compare_images(self, img1, img2):
+        """Compare two images using SSIM."""
         img1 = cv2.resize(img1, (256, 256))
         img2 = cv2.resize(img2, (256, 256))
 
@@ -56,7 +58,8 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
-
+        """Run the image comparison process."""
+        # Get images from the redis database
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -65,7 +68,9 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
+
         diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
+
 
         self.context["similarityScore"] = similarity
 
