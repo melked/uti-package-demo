@@ -2,6 +2,7 @@ from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
+
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -83,6 +84,7 @@ class DiffImage(Output):
         title = "Difference Image"
 
 
+# Konfigürasyon sınıfları
 class Degree(Config):
     name: Literal["Degree"] = "Degree"
     value: int = Field(ge=-359.0, le=359.0, default=0)
@@ -143,6 +145,7 @@ class CompareModeConfig(Config):
         title = "Comparison Method"
 
 
+# Gray ve Compare için Input/Output yapılarını oluşturma
 class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
 
@@ -227,59 +230,20 @@ class Compare(Config):
                 "value": 0
             }
         }
-class PackageInputs(Inputs):
-    inputImage: InputImage
-
-
-class PackageConfigs(Configs):
-    degree: Degree
-    drawBBox: KeepSideBBox
-
-
-class PackageOutputs(Outputs):
-    outputImage: OutputImage
-
-
-class PackageRequest(Request):
-    inputs: Optional[PackageInputs]
-    configs: PackageConfigs
-
-    class Config:
-        json_schema_extra = {
-            "target": "configs"
-        }
-
-
-class PackageResponse(Response):
-    outputs: PackageOutputs
-
-class PackageExecutor(Config):
-    name: Literal["Package"] = "Package"
-    value: Union[PackageRequest, PackageResponse]
-    type: Literal["object"] = "object"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Package"
-        json_schema_extra = {
-            "target": {
-                "value": 0
-            }
-        }
-
 
 
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[PackageExecutor]
+    value: Union[Gray, Compare]  # Gray veya Compare seçilecek
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
-        title = "Task"
+        title = "Executor Type"
         json_schema_extra = {
             "target": "value"
         }
+
 
 
 class PackageConfigs(Configs):
