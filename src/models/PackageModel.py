@@ -2,7 +2,7 @@ from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
-
+# -- Input ve Output Sınıfları --
 class InputFirstImage(Input):
     name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
@@ -229,10 +229,9 @@ class Compare(Config):
             }
         }
 
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[Gray, Compare]
+    value: Union[Gray, Compare]  # Burada sadece Gray veya Compare seçilecek
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
@@ -241,7 +240,6 @@ class ConfigExecutor(Config):
         json_schema_extra = {
             "target": "value"
         }
-
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
