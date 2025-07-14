@@ -231,16 +231,12 @@ class Compare(Config):
 
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[Gray, Compare]  # Burada sadece Gray veya Compare seçilecek
+    value: Union[Gray, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
         title = "Executor Type"
-        json_schema_extra = {
-            "target": "value"
-        }
-
 class PackageConfigs(Configs):
     executor: ConfigExecutor
 
