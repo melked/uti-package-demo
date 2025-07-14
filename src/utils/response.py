@@ -1,41 +1,36 @@
-from sdks.novavision.src.helper.package import PackageHelper
-
+from copy import deepcopy
 from components.GrayCompare.src.models.PackageModel import (
+    Compare, CompareOutputs, CompareResponse, DiffImage,
     Gray, GrayOutputs, GrayResponse,
-    Compare, CompareOutputs, CompareResponse,
-    OutputFirstImage, OutputDiffImage, OutputSecondImage,
     ConfigExecutor, PackageConfigs, PackageModel
 )
-
+from sdks.novavision.src.helper.package import PackageHelper
 
 def build_response(context, diff_image=None, second_image=None, is_compare=False):
     """
-    :param context: Component objesi
-    :param diff_image: SSIM sonucu fark görüntüsü (Image)
-    :param second_image: Karşılaştırılan ikinci görüntü (Image)
-    :param is_compare: Compare executor çalışıyorsa True, Gray ise False
+    context: executor objesi
+    diff_image: Image objesi (compare için diff resmi)
+    second_image: Image objesi (compare için ikinci input resmi)
+    is_compare: bool, True ise compare, False ise gray output oluşturulur
     """
 
     if is_compare:
 
-        diff_output = OutputDiffImage(value=diff_image)
-        second_output = OutputSecondImage(value=second_image)
+        diff_img_output = DiffImage(value=diff_image)
         compare_outputs = CompareOutputs(
-            outputDiffImage=diff_output,
-            outputSecondImage=second_output
+            outputFirstImage=diff_img_output,
+            outputSecondImage=second_image
         )
         compare_response = CompareResponse(outputs=compare_outputs)
-        executor_model = Compare(value=compare_response)
+        compare = Compare(value=compare_response)
+        config_executor = ConfigExecutor(value=compare)
 
     else:
+        output_image = GrayOutputs(outputFirstImage=context.image)
+        gray_response = GrayResponse(outputs=output_image)
+        gray = Gray(value=gray_response)
+        config_executor = ConfigExecutor(value=gray)
 
-        gray_output = OutputFirstImage(value=context.image)
-        gray_outputs = GrayOutputs(outputFirstImage=gray_output)
-        gray_response = GrayResponse(outputs=gray_outputs)
-        executor_model = Gray(value=gray_response)
-
-
-    config_executor = ConfigExecutor(value=executor_model)
     package_configs = PackageConfigs(executor=config_executor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=package_configs)
     package_model = package.build_model(context)
