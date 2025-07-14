@@ -13,8 +13,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
-from components.Gray.src.utils.response import build_response
-from components.Gray.src.models.PackageModel import PackageModel
+from components.GrayCompare.src.utils.response import build_response
+from components.GrayCompare.src.models.PackageModel import PackageModel
 
 
 class Compare(Component):
@@ -60,11 +60,12 @@ class Compare(Component):
 
         diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
 
+        # Sadece JSON için context üzerinden return edilecek veriler
         self.context["similarityScore"] = similarity
 
         packageModel = build_response(
             context=self,
-            image=diff_img
+            image=diff_img  # bu diff görseli doğrudan output olarak döner
         )
 
         return packageModel

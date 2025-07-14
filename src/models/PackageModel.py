@@ -1,71 +1,43 @@
-from pydantic import Field, validator, root_validator
+from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
-from sdks.novavision.src.base.model import (
-    Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
-)
-
-# --- Input ve Output Modelleri ---
-class InputFirstImage(Input):
-    name: Literal["inputFirstImage"] = "inputFirstImage"
-    value: Union[List[Image], Image]
-    type: str = "object"
-
-    @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
-        if value is None:
-            raise ValueError("inputFirstImage value cannot be None!")
-        if isinstance(value, Image):
-            return "object"
-        elif isinstance(value, list):
-            return "list"
-        return value
-
-    class Config:
-        title = "Image"
+from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
 
-class InputSecondImage(Input):
-    name: Literal["inputSecondImage"] = "inputSecondImage"
-    value: Union[List[Image], Image]
-    type: str = "object"
 
-    @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
-        if value is None:
-            raise ValueError("inputSecondImage value cannot be None!")
-        if isinstance(value, Image):
-            return "object"
-        elif isinstance(value, list):
-            return "list"
-        return value
-
-    class Config:
-        title = "Image"
-
-
-class OutputFirstImage(Output):
-    name: Literal["outputFirstImage"] = "outputFirstImage"
+class InputImage(Input):
+    name: Literal["inputImage"] = "inputImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
         value = values.get('value')
-        if value is None:
-            raise ValueError("outputFirstImage value cannot be None!")
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
             return "list"
-        return value
 
     class Config:
         title = "Image"
 
 
-# --- KeepSide ve Compare Mode Modelleri ---
+class OutputImage(Output):
+    name: Literal["outputImage"] = "outputImage"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type_based_on_value(cls, value, values):
+        value = values.get('value')
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+    class Config:
+        title = "Image"
+
+
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -96,38 +68,27 @@ class KeepSideBBox(Config):
         title = "Keep Sides"
 
 
-class CompareModeSSIM(Config):
-    name: Literal["SSIM"] = "SSIM"
-    value: Literal["SSIM"] = "SSIM"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
+class Degree(Config):
+    name: Literal["Degree"] = "Degree"
+    value: int = Field(ge=-359.0, le=359.0, default=0)
+    type: Literal["number"] = "number"
+    field: Literal["textInput"] = "textInput"
 
     class Config:
-        title = "SSIM"
+        title = "Angleeeee"
 
 
-class CompareModeConfig(Config):
-    name: Literal["CompareMode"] = "CompareMode"
-    value: Union[CompareModeSSIM]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-
-    class Config:
-        title = "Comparison Method"
-
-
-# --- Gray Request ve Response Modelleri ---
 class GrayInputs(Inputs):
-    inputFirstImage: InputFirstImage
-    inputSecondImage: InputSecondImage
+    inputImage: InputImage
 
 
 class GrayConfigs(Configs):
-    KeepSide: KeepSideBBox
+    degree: Degree
+    drawBBox: KeepSideBBox
 
 
 class GrayRequest(Request):
-    inputs: Optional[GrayInputs] = None
+    inputs: Optional[GrayInputs]
     configs: GrayConfigs
 
     class Config:
@@ -135,16 +96,9 @@ class GrayRequest(Request):
             "target": "configs"
         }
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if self.inputs is None:
-            self.inputs = GrayInputs(inputFirstImage=None, inputSecondImage=None)
-        if self.configs is None:
-            self.configs = GrayConfigs(KeepSide=None)
-
 
 class GrayOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
+    outputImage: OutputImage
 
 
 class GrayResponse(Response):
@@ -158,7 +112,7 @@ class Gray(Config):
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Gray"
+        title = "GrayExecutor"
         json_schema_extra = {
             "target": {
                 "value": 0
@@ -166,35 +120,76 @@ class Gray(Config):
         }
 
 
-# --- Compare Request ve Response Modelleri ---
+class InputImage1(Input):
+    name: Literal["inputImage1"] = "inputImage1"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type_based_on_value(cls, value, values):
+        value = values.get("value")
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+
+class InputImage2(Input):
+    name: Literal["inputImage2"] = "inputImage2"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type_based_on_value(cls, value, values):
+        value = values.get("value")
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+
+class SimilarityScore(Output):
+    name: Literal["similarityScore"] = "similarityScore"
+    value: float
+    type: Literal["number"] = "number"
+
+
+class DiffImage(Output):
+    name: Literal["diffImage"] = "diffImage"
+    value: Union[List[Image], Image]
+    type: str = "object"
+
+    @validator("type", pre=True, always=True)
+    def set_type_based_on_value(cls, value, values):
+        value = values.get("value")
+        if isinstance(value, Image):
+            return "object"
+        elif isinstance(value, list):
+            return "list"
+
+
 class CompareInputs(Inputs):
-    inputFirstImage: InputFirstImage
-    inputSecondImage: InputSecondImage
+    inputImage1: InputImage1
+    inputImage2: InputImage2
 
 
 class CompareConfigs(Configs):
-    CompareMode: CompareModeConfig
-
-
-class CompareRequest(Request):
-    inputs: Optional[CompareInputs] = None
-    configs: CompareConfigs
-
-    class Config:
-        json_schema_extra = {
-            "target": "configs"
-        }
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        if self.inputs is None:
-            self.inputs = CompareInputs(inputFirstImage=None, inputSecondImage=None)
-        if self.configs is None:
-            self.configs = CompareConfigs(CompareMode=None)
+    pass
 
 
 class CompareOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
+    similarityScore: SimilarityScore
+    diffImage: DiffImage
+
+
+class CompareRequest(Request):
+    inputs: Optional[CompareInputs]
+    configs: Optional[CompareConfigs]
+
+    class Config:
+        json_schema_extra = {
+            "target": "inputs"
+        }
 
 
 class CompareResponse(Response):
@@ -208,7 +203,7 @@ class Compare(Config):
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Compare"
+        title = "CompareExecutor"
         json_schema_extra = {
             "target": {
                 "value": 0
@@ -216,7 +211,6 @@ class Compare(Config):
         }
 
 
-# --- ConfigExecutor ve Package Modelleri ---
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -224,7 +218,10 @@ class ConfigExecutor(Config):
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
-        title = "Type"
+        title = "Task"
+        json_schema_extra = {
+            "target": "value"
+        }
 
 
 class PackageConfigs(Configs):
