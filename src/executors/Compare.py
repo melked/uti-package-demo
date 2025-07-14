@@ -1,13 +1,10 @@
-
-"""
-    It is a component that compares two images and returns a similarity score and a difference image.
-"""
-
 import os
 import cv2
 import sys
 import numpy as np
 from skimage.metrics import structural_similarity as ssim
+from pydantic import Field, validator
+from typing import List, Union, Literal
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 
@@ -22,12 +19,20 @@ class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
+        # İki girdi alıyoruz
         self.image1 = self.request.get_param("inputImage1")
         self.image2 = self.request.get_param("inputImage2")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
-        return {}
+        return {
+            "dependentDropdown": {
+                "options": [
+                    {"label": "Option 1", "value": "option1", "field_type": "image"},
+                    {"label": "Option 2", "value": "option2", "field_type": "text"}
+                ]
+            }
+        }
 
     def ensure_uint8(self, image):
         if image.dtype != np.uint8:
@@ -51,6 +56,7 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
+
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -61,12 +67,12 @@ class Compare(Component):
 
         diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
 
-        # Sadece JSON için context üzerinden return edilecek veriler
         self.context["similarityScore"] = similarity
 
         packageModel = build_response(
             context=self,
-            image=diff_img  # bu diff görseli doğrudan output olarak döner
+            image=diff_img,
+            similarity_score=similarity
         )
 
         return packageModel

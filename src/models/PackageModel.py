@@ -183,6 +183,7 @@ class CompareRequest(Request):
 
 class CompareOutputs(Outputs):
     outputFirstImage: OutputFirstImage
+    outputSecondImage: OutputFirstImage
 
 
 class CompareResponse(Response):
@@ -204,7 +205,6 @@ class Compare(Config):
         }
 
 
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
@@ -217,6 +217,7 @@ class ConfigExecutor(Config):
 
 class PackageConfigs(Configs):
     executor: ConfigExecutor
+
 
 class PackageModel(Package):
     configs: PackageConfigs

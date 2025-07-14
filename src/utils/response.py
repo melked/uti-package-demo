@@ -15,24 +15,29 @@ def build_response(context, similarity_score=None, diff_image=None, is_compare=F
     """
 
     if is_compare:
-        # Compare için response oluştur
+
         sim_score = SimilarityScore(value=similarity_score if similarity_score is not None else 0.0)
         diff_img_output = DiffImage(value=diff_image)
+
         compare_outputs = CompareOutputs(similarityScore=sim_score, diffImage=diff_img_output)
         compare_response = CompareResponse(outputs=compare_outputs)
+
         compare = Compare(value=compare_response)
         config_executor = ConfigExecutor(value=compare)
 
     else:
 
-        output_image =OutputFirstImage(value=context.image)
+        output_image = OutputFirstImage(value=context.image)
+
         gray_outputs = GrayOutputs(outputImage=output_image)
         gray_response = GrayResponse(outputs=gray_outputs)
+
         gray = Gray(value=gray_response)
         config_executor = ConfigExecutor(value=gray)
 
     package_configs = PackageConfigs(executor=config_executor)
     package = PackageHelper(packageModel=PackageModel, packageConfigs=package_configs)
+
     package_model = package.build_model(context)
 
     return package_model
