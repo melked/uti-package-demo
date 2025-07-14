@@ -3,9 +3,8 @@ from typing import List, Optional, Union, Literal
 from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
 
 
-
-class InputImage(Input):
-    name: Literal["inputImage"] = "inputImage"
+class InputFirstImage(Input):
+    name: Literal["inputFirstImage"] = "inputFirstImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
@@ -16,13 +15,14 @@ class InputImage(Input):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
     class Config:
         title = "Image"
 
 
-class OutputImage(Output):
-    name: Literal["outputImage"] = "outputImage"
+class OutputFirstImage(Output):
+    name: Literal["outputFirstImage"] = "outputFirstImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
@@ -33,11 +33,13 @@ class OutputImage(Output):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
     class Config:
         title = "Image"
 
 
+# --- Keep Side Config ---
 class KeepSideFalse(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
@@ -75,11 +77,11 @@ class Degree(Config):
     field: Literal["textInput"] = "textInput"
 
     class Config:
-        title = "Angleeeee"
+        title = "Angle"
 
 
 class GrayInputs(Inputs):
-    inputImage: InputImage
+    inputFirstImage: InputFirstImage
 
 
 class GrayConfigs(Configs):
@@ -88,7 +90,7 @@ class GrayConfigs(Configs):
 
 
 class GrayRequest(Request):
-    inputs: Optional[GrayInputs]
+    inputs: Optional[GrayInputs] = None
     configs: GrayConfigs
 
     class Config:
@@ -98,7 +100,7 @@ class GrayRequest(Request):
 
 
 class GrayOutputs(Outputs):
-    outputImage: OutputImage
+    outputFirstImage: OutputFirstImage
 
 
 class GrayResponse(Response):
@@ -120,32 +122,23 @@ class Gray(Config):
         }
 
 
-class InputImage1(Input):
-    name: Literal["inputImage1"] = "inputImage1"
+# --- Compare Executor Konfigürasyonları ---
+class InputSecondImage(Input):
+    name: Literal["inputSecondImage"] = "inputSecondImage"
     value: Union[List[Image], Image]
     type: str = "object"
 
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
+        value = values.get('value')
         if isinstance(value, Image):
             return "object"
         elif isinstance(value, list):
             return "list"
+        return value
 
-
-class InputImage2(Input):
-    name: Literal["inputImage2"] = "inputImage2"
-    value: Union[List[Image], Image]
-    type: str = "object"
-
-    @validator("type", pre=True, always=True)
-    def set_type_based_on_value(cls, value, values):
-        value = values.get("value")
-        if isinstance(value, Image):
-            return "object"
-        elif isinstance(value, list):
-            return "list"
+    class Config:
+        title = "Image"
 
 
 class SimilarityScore(Output):
@@ -169,8 +162,8 @@ class DiffImage(Output):
 
 
 class CompareInputs(Inputs):
-    inputImage1: InputImage1
-    inputImage2: InputImage2
+    inputFirstImage: InputFirstImage
+    inputSecondImage: InputSecondImage
 
 
 class CompareConfigs(Configs):
@@ -183,8 +176,8 @@ class CompareOutputs(Outputs):
 
 
 class CompareRequest(Request):
-    inputs: Optional[CompareInputs]
-    configs: Optional[CompareConfigs]
+    inputs: Optional[CompareInputs] = None
+    configs: Optional[CompareConfigs] = None
 
     class Config:
         json_schema_extra = {
