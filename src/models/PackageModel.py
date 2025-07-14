@@ -229,6 +229,7 @@ class Compare(Config):
             }
         }
 
+
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[Gray, Compare]
