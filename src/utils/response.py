@@ -1,6 +1,6 @@
 from components.GrayCompare.src.models.PackageModel import (
     PackageModel, PackageConfigs, ConfigExecutor,
-    Gray, GrayResponse, GrayOutputs, OutputImage,
+    Gray, GrayResponse, GrayOutputs, OutputFirstImage,
     Compare, CompareResponse, CompareOutputs, SimilarityScore, DiffImage
 )
 from sdks.novavision.src.helper.package import PackageHelper
@@ -24,8 +24,8 @@ def build_response(context, similarity_score=None, diff_image=None, is_compare=F
         config_executor = ConfigExecutor(value=compare)
 
     else:
-        # Gray için response oluştur
-        output_image = OutputImage(value=context.image)
+
+        output_image =OutputFirstImage(value=context.image)
         gray_outputs = GrayOutputs(outputImage=output_image)
         gray_response = GrayResponse(outputs=gray_outputs)
         gray = Gray(value=gray_response)
