@@ -66,7 +66,6 @@ class Compare(Component):
         second_image_obj = deepcopy(img2)
         image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-
         self.similarityScore = similarity
         self.image = diff_img
 
