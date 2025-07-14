@@ -2,6 +2,7 @@ import os
 import cv2
 import sys
 import numpy as np
+from copy import deepcopy
 from skimage.metrics import structural_similarity as ssim
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
@@ -16,7 +17,6 @@ class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
 
-
         self.request.model = PackageModel(**self.request.data)
 
         self.compare_mode = self.request.get_param("CompareMode")
@@ -28,7 +28,6 @@ class Compare(Component):
         return {}
 
     def ensure_uint8(self, image: np.ndarray) -> np.ndarray:
-        """Resmi 0-255 aralığına normalize eder ve uint8'e çevirir."""
         if image.dtype != np.uint8:
             if image.max() <= 1.0:
                 image = (image * 255).astype(np.uint8)
@@ -37,7 +36,6 @@ class Compare(Component):
         return image
 
     def compare_images(self, img1: np.ndarray, img2: np.ndarray) -> tuple[float, np.ndarray]:
-        """SSIM kullanarak iki resmi karşılaştırır ve fark görüntüsü oluşturur."""
         img1_resized = cv2.resize(img1, (256, 256))
         img2_resized = cv2.resize(img2, (256, 256))
 
@@ -51,7 +49,6 @@ class Compare(Component):
         return float(score), diff_colored
 
     def run(self):
-
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -60,10 +57,14 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
-        diff_img = Image.set_frame(img=Image(value=diff_image), package_uID=self.uID, redis_db=self.redis_db)
+        # Burada deepcopy ile var olan Image objesini klonla, value olarak diff görüntüyü ver
+        diff_image_obj = deepcopy(img1)
+        diff_image_obj.value = diff_image
+        diff_img = Image.set_frame(img=diff_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-        image2_output = Image.set_frame(img=img2, package_uID=self.uID, redis_db=self.redis_db)
-
+        # İkinci görüntüyü de aynı şekilde kopyala (değişmeden)
+        second_image_obj = deepcopy(img2)
+        image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
         self.context["similarityScore"] = similarity
 
@@ -75,6 +76,7 @@ class Compare(Component):
         )
 
         return package_model
+
 
 if __name__ == "__main__":
     Executor(sys.argv[1]).run()
