@@ -21,7 +21,7 @@ class Gray(Component):
         self.request.model = PackageModel(**(self.request.data))
         self.rotation_degree = self.request.get_param("Degree")
         self.keep_side = self.request.get_param("KeepSide")
-        self.image = self.request.get_param("inputImage")
+        self.image = self.request.get_param("inputFirstImage")
 
     @staticmethod
     def bootstrap(config: dict) -> dict:
