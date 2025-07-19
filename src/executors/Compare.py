@@ -13,8 +13,8 @@ from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
 
-from components.GrayCompare.src.models.PackageModel import PackageModel
-from components.GrayCompare.src.utils.response import build_response
+from components.CartoonCompare.src.models.PackageModel import PackageModel
+from components.CartoonCompare.src.utils.response import build_response
 
 
 class Compare(Component):
@@ -25,8 +25,6 @@ class Compare(Component):
         self.compare_mode = self.request.get_param("CompareMode")
         self.image1 = self.request.get_param("inputFirstImage")
         self.image2 = self.request.get_param("inputSecondImage")
-
-
         self.context = {}
 
     @staticmethod

@@ -39,6 +39,24 @@ class InputSecondImage(Input):
     class Config:
         title = "Second Image"
 
+class InputCartoonText(Input):
+    name: Literal["inputCartoonText"] = "inputCartoonText"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Cartoon Extra Text"
+
+
+class InputCompareText(Input):
+    name: Literal["inputCompareText"] = "inputCompareText"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Compare Extra Text"
 
 
 class OutputFirstImage(Output):
@@ -55,7 +73,7 @@ class OutputFirstImage(Output):
             return "list"
 
     class Config:
-        title = "Gray Output"
+        title = "Cartoon Output"
 
 
 class OutputSecondImage(Output):
@@ -92,83 +110,84 @@ class OutputDiffImage(Output):
         title = "Diff Image"
 
 
-
-class Degree(Config):
-    name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359, le=359, default=0)
-    type: Literal["number"] = "number"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Rotation Degree"
-
-
-class KeepSideFalse(Config):
-    name: Literal["False"] = "False"
-    value: Literal[False] = False
-    type: Literal["bool"] = "bool"
+class CartoonModeNormal(Config):
+    name: Literal["Normal"] = "Normal"
+    value: Literal["Normal"] = "Normal"
+    type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Disable"
+        title = "Normal Cartoon"
 
 
-class KeepSideTrue(Config):
-    name: Literal["True"] = "True"
-    value: Literal[True] = True
-    type: Literal["bool"] = "bool"
+class CartoonModeInvert(Config):
+    name: Literal["Invert"] = "Invert"
+    value: Literal["Invert"] = "Invert"
+    type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Enable"
+        title = "Invert Cartoon"
 
 
-class KeepSide(Config):
-    name: Literal["KeepSide"] = "KeepSide"
-    value: Union[KeepSideTrue, KeepSideFalse]
+class CartoonMode(Config):
+    name: Literal["CartoonMode"] = "CartoonMode"
+    value: Union[CartoonModeNormal, CartoonModeInvert]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
     class Config:
-        title = "Keep Sides"
+        title = "Cartoon Mode"
 
 
-
-class GrayInputs(Inputs):
-    inputFirstImage: InputFirstImage
-
-
-class GrayOutputs(Outputs):
-    outputFirstImage: OutputFirstImage
-
-
-class GrayConfigs(Configs):
-    Degree: Degree
-    KeepSide: KeepSide
-
-
-class GrayRequest(Request):
-    inputs: Optional[GrayInputs]
-    configs: GrayConfigs
-
-    class Config:
-        json_schema_extra = {"target": "configs"}
-
-
-class GrayResponse(Response):
-    outputs: GrayOutputs
-
-
-class Gray(Config):
-    name: Literal["Gray"] = "Gray"
-    value: Union[GrayRequest, GrayResponse]
-    type: Literal["object"] = "object"
+class CartoonOutputSingle(Config):
+    name: Literal["Single"] = "Single"
+    value: Literal["Single"] = "Single"
+    type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Gray"
-        json_schema_extra = {"target": {"value": 0}}
+        title = "Single Output"
 
+
+class CartoonOutputMulti(Config):
+    name: Literal["Multi"] = "Multi"
+    value: Literal["Multi"] = "Multi"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Multi Output"
+
+
+class CartoonOutputType(Config):
+    name: Literal["CartoonOutputType"] = "CartoonOutputType"
+    value: Union[CartoonOutputSingle, CartoonOutputMulti]
+    type: Literal["object"] = "object"
+    field: Literal["dropdownlist"] = "dropdownlist"
+
+    class Config:
+        title = "Cartoon Output Type"
+
+
+class CartoonDescription(Config):
+    name: Literal["Description"] = "Description"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Cartoon Description"
+
+
+class CartoonNotes(Config):
+    name: Literal["Notes"] = "Notes"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Cartoon Notes"
 
 
 class CompareModeSSIM(Config):
@@ -181,9 +200,19 @@ class CompareModeSSIM(Config):
         title = "SSIM"
 
 
+class CompareModePixelDiff(Config):
+    name: Literal["PixelDiff"] = "PixelDiff"
+    value: Literal["PixelDiff"] = "PixelDiff"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Pixel Difference"
+
+
 class CompareMode(Config):
     name: Literal["CompareMode"] = "CompareMode"
-    value: Union[CompareModeSSIM]
+    value: Union[CompareModeSSIM, CompareModePixelDiff]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
@@ -191,19 +220,112 @@ class CompareMode(Config):
         title = "Comparison Method"
 
 
+class CompareOutputDiffOnly(Config):
+    name: Literal["DiffOnly"] = "DiffOnly"
+    value: Literal["DiffOnly"] = "DiffOnly"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Diff Only"
+
+
+class CompareOutputDiffAndOverlay(Config):
+    name: Literal["DiffAndOverlay"] = "DiffAndOverlay"
+    value: Literal["DiffAndOverlay"] = "DiffAndOverlay"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Diff + Overlay"
+
+
+class CompareOutputType(Config):
+    name: Literal["CompareOutputType"] = "CompareOutputType"
+    value: Union[CompareOutputDiffOnly, CompareOutputDiffAndOverlay]
+    type: Literal["object"] = "object"
+    field: Literal["dropdownlist"] = "dropdownlist"
+
+    class Config:
+        title = "Output Type"
+
+
+class CompareComment(Config):
+    name: Literal["Comment"] = "Comment"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Compare Comment"
+
+
+class CompareThresholdNote(Config):
+    name: Literal["ThresholdNote"] = "ThresholdNote"
+    value: str = Field(default="")
+    type: Literal["string"] = "string"
+    field: Literal["textInput"] = "textInput"
+
+    class Config:
+        title = "Compare Threshold Note"
+
+
+class CartoonInputs(Inputs):
+    inputFirstImage: InputFirstImage
+    inputCartoonText: Optional[InputCartoonText]
+
+
+class CartoonOutputs(Outputs):
+    outputFirstImage: OutputFirstImage
+    outputSecondImage: Optional[OutputSecondImage]
+
+
+class CartoonConfigs(Configs):
+    CartoonMode: CartoonMode
+    CartoonOutputType: CartoonOutputType
+    Description: CartoonDescription
+    Notes: CartoonNotes
+
+
+class CartoonRequest(Request):
+    inputs: Optional[CartoonInputs]
+    configs: CartoonConfigs
+
+    class Config:
+        json_schema_extra = {"target": "configs"}
+
+
+class CartoonResponse(Response):
+    outputs: CartoonOutputs
+
+
+class Cartoon(Config):
+    name: Literal["Cartoon"] = "Cartoon"
+    value: Union[CartoonRequest, CartoonResponse]
+    type: Literal["object"] = "object"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Cartoon"
+        json_schema_extra = {"target": {"value": 0}}
+
 
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
+    inputCompareText: Optional[InputCompareText]
 
 
 class CompareOutputs(Outputs):
     outputDiffImage: OutputDiffImage
-    outputSecondImage: OutputSecondImage
+    outputSecondImage: Optional[OutputSecondImage]
 
 
 class CompareConfigs(Configs):
     CompareMode: CompareMode
+    CompareOutputType: CompareOutputType
+    Comment: CompareComment
+    ThresholdNote: CompareThresholdNote
 
 
 class CompareRequest(Request):
@@ -229,16 +351,14 @@ class Compare(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
-
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[Gray, Compare]
+    value: Union[Cartoon, Compare]
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
 
     class Config:
-        title = "Gray or Compare Executor"
-
+        title = "Cartoon or Compare Executor"
 
 
 class PackageConfigs(Configs):
@@ -248,4 +368,4 @@ class PackageConfigs(Configs):
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
-    name: Literal["GrayCompare"] = "GrayCompare"
+    name: Literal["CartoonCompare"] = "CartoonCompare"
