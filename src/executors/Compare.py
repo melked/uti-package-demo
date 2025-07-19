@@ -21,10 +21,10 @@ class Compare(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**self.request.data)
-
         self.compare_mode = self.request.get_param("CompareMode")
         self.image1 = self.request.get_param("inputFirstImage")
         self.image2 = self.request.get_param("inputSecondImage")
+        self.compare_text = self.request.get_param("inputCompareText")
         self.context = {}
 
     @staticmethod
@@ -49,11 +49,9 @@ class Compare(Component):
         score, diff = ssim(gray1, gray2, full=True)
         diff = (diff * 255).astype(np.uint8)
         diff_colored = cv2.cvtColor(diff, cv2.COLOR_GRAY2BGR)
-
         return float(score), diff_colored
 
     def run(self):
-
         img1 = Image.get_frame(img=self.image1, redis_db=self.redis_db)
         img2 = Image.get_frame(img=self.image2, redis_db=self.redis_db)
 
@@ -62,15 +60,12 @@ class Compare(Component):
 
         similarity, diff_image = self.compare_images(img1.value, img2.value)
 
-
         diff_image_obj = deepcopy(img1)
         diff_image_obj.value = diff_image
         diff_img = Image.set_frame(img=diff_image_obj, package_uID=self.uID, redis_db=self.redis_db)
 
-
         second_image_obj = deepcopy(img2)
         image2_output = Image.set_frame(img=second_image_obj, package_uID=self.uID, redis_db=self.redis_db)
-
 
         self.context["similarityScore"] = similarity
         self.context["image"] = diff_img
@@ -81,7 +76,6 @@ class Compare(Component):
             second_image=image2_output,
             is_compare=True
         )
-
         return package_model
 
 
