@@ -207,7 +207,7 @@ class CompareModePixelDiff(Config):
     field: Literal["option"] = "option"
 
     class Config:
-        title = "Pixel Difference"
+        title = "Pixel Differenceee"
 
 
 class CompareMode(Config):
