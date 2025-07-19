@@ -39,25 +39,6 @@ class InputSecondImage(Input):
     class Config:
         title = "Second Image"
 
-class InputCartoonText(Input):
-    name: Literal["inputCartoonText"] = "inputCartoonText"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Cartoon Extra Text"
-
-
-class InputCompareText(Input):
-    name: Literal["inputCompareText"] = "inputCompareText"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Compare Extra Text"
-
 
 class OutputFirstImage(Output):
     name: Literal["outputFirstImage"] = "outputFirstImage"
@@ -90,7 +71,7 @@ class OutputSecondImage(Output):
             return "list"
 
     class Config:
-        title = "Second Output"
+        title = "Second / Original Output"
 
 
 class OutputDiffImage(Output):
@@ -169,110 +150,8 @@ class CartoonOutputType(Config):
     class Config:
         title = "Cartoon Output Type"
 
-
-class CartoonDescription(Config):
-    name: Literal["Description"] = "Description"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Cartoon Description"
-
-
-class CartoonNotes(Config):
-    name: Literal["Notes"] = "Notes"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Cartoon Notes"
-
-
-class CompareModeSSIM(Config):
-    name: Literal["SSIM"] = "SSIM"
-    value: Literal["SSIM"] = "SSIM"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "SSIM"
-
-
-class CompareModePixelDiff(Config):
-    name: Literal["PixelDiff"] = "PixelDiff"
-    value: Literal["PixelDiff"] = "PixelDiff"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Pixel Differenceee"
-
-
-class CompareMode(Config):
-    name: Literal["CompareMode"] = "CompareMode"
-    value: Union[CompareModeSSIM, CompareModePixelDiff]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-
-    class Config:
-        title = "Comparison Method"
-
-
-class CompareOutputDiffOnly(Config):
-    name: Literal["DiffOnly"] = "DiffOnly"
-    value: Literal["DiffOnly"] = "DiffOnly"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Diff Only"
-
-
-class CompareOutputDiffAndOverlay(Config):
-    name: Literal["DiffAndOverlay"] = "DiffAndOverlay"
-    value: Literal["DiffAndOverlay"] = "DiffAndOverlay"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Diff + Overlay"
-
-
-class CompareOutputType(Config):
-    name: Literal["CompareOutputType"] = "CompareOutputType"
-    value: Union[CompareOutputDiffOnly, CompareOutputDiffAndOverlay]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-
-    class Config:
-        title = "Output Type"
-
-
-class CompareComment(Config):
-    name: Literal["Comment"] = "Comment"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Compare Comment"
-
-
-class CompareThresholdNote(Config):
-    name: Literal["ThresholdNote"] = "ThresholdNote"
-    value: str = Field(default="")
-    type: Literal["string"] = "string"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Compare Threshold Note"
-
-
 class CartoonInputs(Inputs):
     inputFirstImage: InputFirstImage
-    inputCartoonText: Optional[InputCartoonText]
 
 
 class CartoonOutputs(Outputs):
@@ -283,8 +162,6 @@ class CartoonOutputs(Outputs):
 class CartoonConfigs(Configs):
     CartoonMode: CartoonMode
     CartoonOutputType: CartoonOutputType
-    Description: CartoonDescription
-    Notes: CartoonNotes
 
 
 class CartoonRequest(Request):
@@ -310,22 +187,49 @@ class Cartoon(Config):
         json_schema_extra = {"target": {"value": 0}}
 
 
+
+class CompareModeSSIM(Config):
+    name: Literal["SSIM"] = "SSIM"
+    value: Literal["SSIM"] = "SSIM"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "SSIM"
+
+
+class CompareModePixelDiff(Config):
+    name: Literal["PixelDiff"] = "PixelDiff"
+    value: Literal["PixelDiff"] = "PixelDiff"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Pixel Difference"
+
+
+class CompareMode(Config):
+    name: Literal["CompareMode"] = "CompareMode"
+    value: Union[CompareModeSSIM, CompareModePixelDiff]
+    type: Literal["object"] = "object"
+    field: Literal["dropdownlist"] = "dropdownlist"
+
+    class Config:
+        title = "Comparison Method"
+
+
 class CompareInputs(Inputs):
     inputFirstImage: InputFirstImage
     inputSecondImage: InputSecondImage
-    inputCompareText: Optional[InputCompareText]
 
 
 class CompareOutputs(Outputs):
     outputDiffImage: OutputDiffImage
-    outputSecondImage: Optional[OutputSecondImage]
+    outputSecondImage: OutputSecondImage
 
 
 class CompareConfigs(Configs):
     CompareMode: CompareMode
-    CompareOutputType: CompareOutputType
-    Comment: CompareComment
-    ThresholdNote: CompareThresholdNote
 
 
 class CompareRequest(Request):
