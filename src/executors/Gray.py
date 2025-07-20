@@ -1,3 +1,18 @@
+"""
+Gray / Cartoon Executor (PackageModel uyumlu)
+---------------------------------------------
+PhotoTypeMode:
+    - Gray     -> Görsel gri tonlamaya çevrilir (3-kanal BGR geri döner).
+    - Cartoon  -> Cartoon efekti.
+        * CartoonMode: Normal | Invert
+        * CartoonOutputType: Single | Multi (şimdilik tek çıktı; genişletmek istersen GrayOutputs'i büyüt)
+
+build_response signature:
+    build_response(context, diff_image=None, second_image=None, is_compare=False)
+
+ÖNEMLİ: build_response image parametresi ALMIYOR.
+Bu yüzden işlenmiş görüntüyü `self.image` içine set edip `is_compare=False` ile çağırıyoruz.
+"""
 
 import os
 import cv2
@@ -9,6 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../../../"))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
+
 from components.GrayCompare.src.utils.response import build_response
 from components.GrayCompare.src.models.PackageModel import PackageModel
 
@@ -18,13 +34,10 @@ class Gray(Component):
         super().__init__(request, bootstrap)
 
         self.request.model = PackageModel(**self.request.data)
-
         self.image = self.request.get_param("inputFirstImage")
-
         self.photo_type_mode = self.request.get_param("PhotoTypeMode")
-
-        self.cartoon_mode = self.request.get_param("CartoonMode")             
-        self.cartoon_output_type = self.request.get_param("CartoonOutputType") 
+        self.cartoon_mode = self.request.get_param("CartoonMode")
+        self.cartoon_output_type = self.request.get_param("CartoonOutputType")
 
         self.context = {}
 
@@ -41,12 +54,10 @@ class Gray(Component):
         return image
 
     def _to_gray3(self, image: np.ndarray) -> np.ndarray:
-        """Tek kanal gri -> 3 kanala geri döndür (UI/codec uyumu için)."""
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
     def _cartoon(self, image: np.ndarray, invert: bool = False) -> np.ndarray:
-   
         img = self._ensure_uint8(image)
 
         color = cv2.bilateralFilter(img, d=9, sigmaColor=75, sigmaSpace=75)
@@ -64,7 +75,6 @@ class Gray(Component):
             blockSize=9,
             C=2
         )
-
         edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
         cartoon = cv2.bitwise_and(color, edges_colored)
 
@@ -89,15 +99,16 @@ class Gray(Component):
         img_obj.value = out_np
         out_img = Image.set_frame(img=img_obj, package_uID=self.uID, redis_db=self.redis_db)
 
+        self.image = out_img
+
         self.context["photoTypeMode"] = mode
         if mode == "Cartoon":
             self.context["cartoonMode"] = self.cartoon_mode
             self.context["cartoonOutputType"] = self.cartoon_output_type
 
-       
         package_model = build_response(
             context=self,
-            image=out_img  
+            is_compare=False  # Gray
         )
         return package_model
 
