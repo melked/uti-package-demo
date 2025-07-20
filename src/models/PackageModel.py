@@ -92,9 +92,9 @@ class OutputDiffImage(Output):
         title = "Diff Image"
 
 
-class Gray(Config):
-    name: Literal["Gray"] = "Gray"
-    value: Literal["Gray"] = "Gray"
+class GrayOption(Config):
+    name: Literal["GrayOption"] = "GrayOption"
+    value: Literal["GrayOption"] = "GrayOption"
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
@@ -102,9 +102,9 @@ class Gray(Config):
         title = "Gray"
 
 
-class Cartoon(Config):
-    name: Literal["Cartoon"] = "Cartoon"
-    value: Literal["Cartoon"] = "Cartoon"
+class CartoonOption(Config):
+    name: Literal["CartoonOption"] = "CartoonOption"
+    value: Literal["CartoonOption"] = "CartoonOption"
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
 
@@ -114,7 +114,7 @@ class Cartoon(Config):
 
 class PhotoTypeMode(Config):
     name: Literal["PhotoTypeMode"] = "PhotoTypeMode"
-    value: Union[Gray, Cartoon]
+    value: Union[GrayOption, CartoonOption]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
@@ -144,6 +144,14 @@ class GrayRequest(Request):
 class GrayResponse(Response):
     outputs: GrayOutputs
 
+class Gray(Config):
+    name: Literal["Gray"] = "Gray"
+    value: Union[GrayRequest, GrayResponse]
+    type: Literal["object"] = "object"
+    field: Literal["option"] = "option"
+
+    class Config:
+        title = "Gray"
 
 class CompareModeSSIM(Config):
     name: Literal["SSIM"] = "SSIM"
@@ -200,7 +208,7 @@ class Compare(Config):
 
     class Config:
         title = "Compare"
-        json_schema_extra = {"target": {"value": 0}}
+        json_schema_extra = {"target":{"value": 0}}
 
 
 
@@ -214,10 +222,8 @@ class ConfigExecutor(Config):
         title = "Gray or Compare Executor"
 
 
-
 class PackageConfigs(Configs):
     executor: ConfigExecutor
-
 
 class PackageModel(Package):
     configs: PackageConfigs
