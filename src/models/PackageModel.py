@@ -161,7 +161,7 @@ class CartoonConfigEdit(Config):
 
 class PhotoGray(Config):
     name: Literal["Gray"] = "Gray"
-    value: str = Field(default="Gray")
+    value: Literal["Gray"] = "Gray"
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
     class Config:
@@ -171,7 +171,7 @@ class PhotoGray(Config):
 class PhotoCartoon(Config):
     configEdit: CartoonConfigEdit
     name: Literal["Cartoon"] = "Cartoon"
-    value: str = Field(default="Cartoon")
+    value: Literal["Cartoon"] = "Cartoon"
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
     class Config:
