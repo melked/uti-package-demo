@@ -112,8 +112,8 @@ class Cartoon(Config):
         title = "Cartoon"
 
 
-class PhotoType(Config):
-    name: Literal["PhotoType"] = "PhotoType"
+class PhotoTypeMode(Config):
+    name: Literal["PhotoTypeMode"] = "PhotoTypeMode"
     value: Union[Gray, Cartoon]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
@@ -130,7 +130,7 @@ class GrayOutputs(Outputs):
 
 
 class GrayConfigs(Configs):
-    PhotoType:PhotoType
+    PhotoTypeMode:PhotoTypeMode
 
 
 class GrayRequest(Request):
