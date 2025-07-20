@@ -92,34 +92,33 @@ class OutputDiffImage(Output):
         title = "Diff Image"
 
 
-class GrayOption(Config):
-    name: Literal["GrayOption"] = "GrayOption"
-    value: Literal["GrayOption"] = "GrayOption"
-    type: Literal["string"] = "string"
+class PhotoGray(Config):
+    name: Literal["Gray"] = "Gray"
+    value: str = "Gray"
+    type: Literal["object"] = "object"
     field: Literal["option"] = "option"
 
     class Config:
         title = "Gray"
 
-
-class CartoonOption(Config):
-    name: Literal["CartoonOption"] = "CartoonOption"
-    value: Literal["CartoonOption"] = "CartoonOption"
-    type: Literal["string"] = "string"
+class PhotoCartoon(Config):
+    name: Literal["Cartoon"] = "Cartoon"
+    value: str = "Cartoon"
+    type: Literal["object"] = "object"
     field: Literal["option"] = "option"
 
     class Config:
         title = "Cartoon"
 
-
 class PhotoTypeMode(Config):
     name: Literal["PhotoTypeMode"] = "PhotoTypeMode"
-    value: Union[GrayOption, CartoonOption]
+    value: Union[PhotoGray, PhotoCartoon]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
     class Config:
         title = "Photo Type"
+
 
 class GrayInputs(Inputs):
     inputFirstImage: InputFirstImage
