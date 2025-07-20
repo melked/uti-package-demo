@@ -11,11 +11,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
 from sdks.novavision.src.media.image import Image
 from sdks.novavision.src.base.component import Component
 from sdks.novavision.src.helper.executor import Executor
-from components.CartoonCompare.src.utils.response import build_response
-from components.CartoonCompare.src.models.PackageModel import PackageModel
+from components.GrayCompare.src.utils.response import build_response
+from components.GrayCompare.src.models.PackageModel import PackageModel
 
 
-class Cartoon(Component):
+class Gray(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         self.request.model = PackageModel(**(self.request.data))
@@ -28,7 +28,7 @@ class Cartoon(Component):
         return {}
 
 
-    def Cartoon(self, image):
+    def Gray(self, image):
 
 
 
@@ -61,7 +61,7 @@ class Cartoon(Component):
 
     def run(self):
         img = Image.get_frame(img=self.image, redis_db=self.redis_db)
-        img.value = self.Cartoon(img.value)
+        img.value = self.Gray(img.value)
         self.image = Image.set_frame(img=img, package_uID=self.uID, redis_db=self.redis_db)
         packageModel = build_response(context=self)
         return packageModel
