@@ -92,18 +92,7 @@ class OutputDiffImage(Output):
         title = "Diff Image"
 
 
-
-class Degree(Config):
-    name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359, le=359, default=0)
-    type: Literal["number"] = "number"
-    field: Literal["textInput"] = "textInput"
-
-    class Config:
-        title = "Rotation Degree"
-
-
-class KeepSideFalse(Config):
+class Gray(Config):
     name: Literal["False"] = "False"
     value: Literal[False] = False
     type: Literal["bool"] = "bool"
@@ -113,7 +102,7 @@ class KeepSideFalse(Config):
         title = "Disable"
 
 
-class KeepSideTrue(Config):
+class Cartoon(Config):
     name: Literal["True"] = "True"
     value: Literal[True] = True
     type: Literal["bool"] = "bool"
@@ -123,14 +112,14 @@ class KeepSideTrue(Config):
         title = "Enable"
 
 
-class KeepSide(Config):
-    name: Literal["KeepSide"] = "KeepSide"
-    value: Union[KeepSideTrue, KeepSideFalse]
+class PhotoType(Config):
+    name: Literal["KeepSide"] = "PhotoType"
+    value: Union[Gray, Cartoon]
     type: Literal["object"] = "object"
     field: Literal["dropdownlist"] = "dropdownlist"
 
     class Config:
-        title = "Keep Sides"
+        title = " Photo Type"
 
 
 
@@ -143,8 +132,7 @@ class GrayOutputs(Outputs):
 
 
 class GrayConfigs(Configs):
-    Degree: Degree
-    KeepSide: KeepSide
+    PhotoType:PhotoType
 
 
 class GrayRequest(Request):
@@ -157,18 +145,6 @@ class GrayRequest(Request):
 
 class GrayResponse(Response):
     outputs: GrayOutputs
-
-
-class Gray(Config):
-    name: Literal["Gray"] = "Gray"
-    value: Union[GrayRequest, GrayResponse]
-    type: Literal["object"] = "object"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Gray"
-        json_schema_extra = {"target": {"value": 0}}
-
 
 
 class CompareModeSSIM(Config):
