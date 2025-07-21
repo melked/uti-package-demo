@@ -91,34 +91,6 @@ class OutputDiffImage(Output):
     class Config:
         title = "Diff Image"
 
-
-class CartoonModeNormal(Config):
-    name: Literal["Normal"] = "Normal"
-    value: Literal["Normal"] = "Normal"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Normal Cartoon"
-
-
-class CartoonModeInvert(Config):
-    name: Literal["Invert"] = "Invert"
-    value: Literal["Invert"] = "Invert"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Invert Cartoon"
-
-
-class CartoonMode(Config):
-    name: Literal["CartoonMode"] = "CartoonMode"
-    value: Union[CartoonModeNormal, CartoonModeInvert]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-    class Config:
-        title = "Cartoon Mode"
-
-
 class CartoonOutputSingle(Config):
     name: Literal["Single"] = "Single"
     value: Literal["Single"] = "Single"
@@ -146,22 +118,38 @@ class CartoonOutputType(Config):
         title = "Cartoon Output Type"
 
 
-class CartoonConfigEdit(Config):
-    """Cartoon alt ayarlarını toplayan container. PhotoTypeMode->Cartoon seçilince açılır."""
-    CartoonMode: CartoonMode
-    CartoonOutputType: CartoonOutputType
-    name: Literal["CartoonConfigEdit"] = "CartoonConfigEdit"
-    value: Literal["CartoonConfigEdit"] = "CartoonConfigEdit"
-    type: Literal["object"] = "object"
-    field: Literal["group"] = "group"
+class CartoonModeNormal(Config):
+    configEdit: CartoonOutputType
+    name: Literal["Normal"] = "Normal"
+    value: Literal["Normal"] = "Normal"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
     class Config:
-        title = "Cartoon Settings"
+        title = "Normal Cartoon"
 
+
+class CartoonModeInvert(Config):
+    configEdit: CartoonOutputType
+    name: Literal["Invert"] = "Invert"
+    value: Literal["Invert"] = "Invert"
+    type: Literal["string"] = "string"
+    field: Literal["option"] = "option"
+    class Config:
+        title = "Invert Cartoon"
+
+
+class CartoonMode(Config):
+    name: Literal["CartoonMode"] = "CartoonMode"
+    value: Union[CartoonModeNormal, CartoonModeInvert]
+    type: Literal["object"] = "object"
+    field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
+    class Config:
+        title = "Cartoon Mode"
 
 
 class PhotoGray(Config):
     name: Literal["Gray"] = "Gray"
-    value: Literal["Gray"] = "Gray"
+    value: str = Field(default="Gray")
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
     class Config:
@@ -169,9 +157,9 @@ class PhotoGray(Config):
 
 
 class PhotoCartoon(Config):
-    configEdit: CartoonConfigEdit
+    configEdit: CartoonMode
     name: Literal["Cartoon"] = "Cartoon"
-    value: Literal["Cartoon"] = "Cartoon"
+    value: str = Field(default="Cartoon")
     type: Literal["string"] = "string"
     field: Literal["option"] = "option"
     class Config:
@@ -185,6 +173,7 @@ class PhotoTypeMode(Config):
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
     class Config:
         title = "Photo Type"
+
 
 
 class GrayInputs(Inputs):
