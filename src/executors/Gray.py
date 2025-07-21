@@ -1,19 +1,3 @@
-"""
-Gray / Cartoon Executor (PackageModel uyumlu)
----------------------------------------------
-PhotoTypeMode:
-    - Gray     -> Görsel gri tonlamaya çevrilir (3-kanal BGR geri döner).
-    - Cartoon  -> Cartoon efekti.
-        * CartoonMode: Normal | Invert
-        * CartoonOutputType: Single | Multi (şimdilik tek çıktı; genişletmek istersen GrayOutputs'i büyüt)
-
-build_response signature:
-    build_response(context, diff_image=None, second_image=None, is_compare=False)
-
-ÖNEMLİ: build_response image parametresi ALMIYOR.
-Bu yüzden işlenmiş görüntüyü `self.image` içine set edip `is_compare=False` ile çağırıyoruz.
-"""
-
 import os
 import cv2
 import sys
@@ -34,10 +18,14 @@ class Gray(Component):
         super().__init__(request, bootstrap)
 
         self.request.model = PackageModel(**self.request.data)
+
+
         self.image = self.request.get_param("inputFirstImage")
+
+
         self.photo_type_mode = self.request.get_param("PhotoTypeMode")
-        self.cartoon_mode = self.request.get_param("CartoonMode")
-        self.cartoon_output_type = self.request.get_param("CartoonOutputType")
+        self.gray_strength = self.request.get_param("GrayStrength")
+        self.cartoon_strength = self.request.get_param("CartoonStrength")
 
         self.context = {}
 
@@ -57,16 +45,13 @@ class Gray(Component):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
 
-    def _cartoon(self, image: np.ndarray, invert: bool = False) -> np.ndarray:
+    def _cartoon(self, image: np.ndarray) -> np.ndarray:
         img = self._ensure_uint8(image)
-
         color = cv2.bilateralFilter(img, d=9, sigmaColor=75, sigmaSpace=75)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         gray_blur = cv2.medianBlur(gray, 5)
-
         if gray_blur.dtype != np.uint8:
             gray_blur = gray_blur.astype(np.uint8)
-
         edges = cv2.adaptiveThreshold(
             gray_blur,
             255,
@@ -77,39 +62,47 @@ class Gray(Component):
         )
         edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
         cartoon = cv2.bitwise_and(color, edges_colored)
-
-        if invert:
-            cartoon = cv2.bitwise_not(cartoon)
-
         return cartoon
+
+    def _percent(self, value, default=100):
+        if value is None:
+            return default
+        try:
+            v = int(value)
+        except Exception:
+            v = default
+        return max(0, min(v, 100))
+
+    def _blend(self, original_bgr, processed_bgr, percent):
+        """percent: 0-100"""
+        alpha = percent / 100.0
+        return cv2.addWeighted(processed_bgr, alpha, original_bgr, 1.0 - alpha, 0)
 
     def run(self):
 
         img_obj = Image.get_frame(img=self.image, redis_db=self.redis_db)
-        np_img = self._ensure_uint8(img_obj.value)
+        src_np = self._ensure_uint8(img_obj.value)
+
 
         mode = self.photo_type_mode if isinstance(self.photo_type_mode, str) else "Gray"
 
         if mode == "Cartoon":
-            invert = (self.cartoon_mode == "Invert")
-            out_np = self._cartoon(np_img, invert=invert)
+            processed_np = self._cartoon(src_np)
+            p = self._percent(self.cartoon_strength, default=100)
         else:
-            out_np = self._to_gray3(np_img)
+            processed_np = self._to_gray3(src_np)
+            p = self._percent(self.gray_strength, default=100)
+
+        out_np = self._blend(src_np, processed_np, p)
 
         img_obj.value = out_np
         out_img = Image.set_frame(img=img_obj, package_uID=self.uID, redis_db=self.redis_db)
 
         self.image = out_img
-
         self.context["photoTypeMode"] = mode
-        if mode == "Cartoon":
-            self.context["cartoonMode"] = self.cartoon_mode
-            self.context["cartoonOutputType"] = self.cartoon_output_type
+        self.context["strengthPercent"] = p
 
-        package_model = build_response(
-            context=self,
-            is_compare=False  # Gray
-        )
+        package_model = build_response(context=self, is_compare=False)
         return package_model
 
 

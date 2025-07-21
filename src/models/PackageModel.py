@@ -93,8 +93,32 @@ class OutputDiffImage(Output):
 
 
 
+class GrayStrength(Config):
+    """
+    0 = hiç grileştirme (orijinal), 100 = tam gri.
+    """
+    name: Literal["GrayStrength"] = "GrayStrength"
+    value: int = Field(default=100, ge=0, le=100)
+    type: Literal["number"] = "number"
+    field: Literal["textInput"] = "textInput"
+    class Config:
+        title = "Gray Strength (%)"
+
+
+class CartoonStrength(Config):
+    """
+    0 = orijinal görüntüye çok yakın, 100 = tam cartoon efekti.
+    """
+    name: Literal["CartoonStrength"] = "CartoonStrength"
+    value: int = Field(default=100, ge=0, le=100)
+    type: Literal["number"] = "number"
+    field: Literal["textInput"] = "textInput"
+    class Config:
+        title = "Cartoon Strength (%)"
+
 
 class PhotoGray(Config):
+    configEdit: GrayStrength
     name: Literal["Gray"] = "Gray"
     value: str = Field(default="Gray")
     type: Literal["string"] = "string"
@@ -104,6 +128,7 @@ class PhotoGray(Config):
 
 
 class PhotoCartoon(Config):
+    configEdit: CartoonStrength
     name: Literal["Cartoon"] = "Cartoon"
     value: str = Field(default="Cartoon")
     type: Literal["string"] = "string"
