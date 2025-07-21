@@ -91,60 +91,7 @@ class OutputDiffImage(Output):
     class Config:
         title = "Diff Image"
 
-class CartoonOutputSingle(Config):
-    name: Literal["Single"] = "Single"
-    value: Literal["Single"] = "Single"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Single Output"
 
-
-class CartoonOutputMulti(Config):
-    name: Literal["Multi"] = "Multi"
-    value: Literal["Multi"] = "Multi"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Multi Output"
-
-
-class CartoonOutputType(Config):
-    name: Literal["CartoonOutputType"] = "CartoonOutputType"
-    value: Union[CartoonOutputSingle, CartoonOutputMulti]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-    class Config:
-        title = "Cartoon Output Type"
-
-
-class CartoonModeNormal(Config):
-    configEdit: CartoonOutputType
-    name: Literal["Normal"] = "Normal"
-    value: Literal["Normal"] = "Normal"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Normal Cartoon"
-
-
-class CartoonModeInvert(Config):
-    configEdit: CartoonOutputType
-    name: Literal["Invert"] = "Invert"
-    value: Literal["Invert"] = "Invert"
-    type: Literal["string"] = "string"
-    field: Literal["option"] = "option"
-    class Config:
-        title = "Invert Cartoon"
-
-
-class CartoonMode(Config):
-    name: Literal["CartoonMode"] = "CartoonMode"
-    value: Union[CartoonModeNormal, CartoonModeInvert]
-    type: Literal["object"] = "object"
-    field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
-    class Config:
-        title = "Cartoon Mode"
 
 
 class PhotoGray(Config):
@@ -157,7 +104,6 @@ class PhotoGray(Config):
 
 
 class PhotoCartoon(Config):
-    configEdit: CartoonMode
     name: Literal["Cartoon"] = "Cartoon"
     value: str = Field(default="Cartoon")
     type: Literal["string"] = "string"
